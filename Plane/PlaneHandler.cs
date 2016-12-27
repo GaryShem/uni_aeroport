@@ -68,11 +68,9 @@ namespace Plane
                             // если самолёт закончил движение, то его можно убрать и сгенерить новый
                             if (plane.State == EntityState.FINISHED_TASK)
                             {
-                                //TODO: убрать самолёт, сделать новый
                                 Planes.Remove(plane);
                                 plane = GeneratePlane();
                                 Planes.Add(plane);
-
                             }
                             // если самолёт ждёт разрешения на посадку, то проверяем свободные полосы
                             else if (plane.State == EntityState.WAITING_FOR_COMMAND)
@@ -89,13 +87,15 @@ namespace Plane
                             // если самолёт ждёт своей очереди на посадку, то проверяем, пришло ли его время
                             else if (plane.State == EntityState.STANDING_BY)
                             {
-                                //TODO: проверка таймера действия, начало посадки
-
+                                if (plane.ActionTime.HasValue && plane.ActionTime < DateTime.Now)
+                                {
+                                    //TODO: отправить визуализатору команду посадки
+                                }
                             }
                         }
 
                         // если самолёт уже сел
-                        if (plane.CurrentZone == Zone.HANGAR_1 || plane.CurrentZone == Zone.HANGAR_2)
+                        else if (plane.CurrentZone == Zone.HANGAR_1 || plane.CurrentZone == Zone.HANGAR_2)
                         {
                             // если самолёт закончил движение, то надо сказать службе наземного контроля о начале разгрузки/погрузки
                             if (plane.State == EntityState.FINISHED_TASK)

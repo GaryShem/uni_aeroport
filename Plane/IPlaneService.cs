@@ -13,14 +13,6 @@ namespace Plane
     [ServiceContract]
     public interface IPlaneService
     {
-
-        [OperationContract]
-        [WebInvoke(Method = "GET",
-             ResponseFormat = WebMessageFormat.Json,
-             BodyStyle = WebMessageBodyStyle.Bare,
-             UriTemplate = "GeneratePlane?passengerCount={passengerCount}&fuelCount={fuelCount}")]
-        void GeneratePlane(int passengerCount, int fuelCount);
-
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
@@ -40,6 +32,13 @@ namespace Plane
              BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "LoadPassengers?id={id}")]
         void LoadPassengers(string id);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GoAway?id={id}")]
+        void GoAway(string id);
 
         [OperationContract]
         [WebInvoke(Method = "GET",

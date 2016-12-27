@@ -14,12 +14,6 @@ namespace Plane
     // NOTE: In order to launch WCF Test Client for testing this service, please select PlaneService.svc or PlaneService.svc.cs at the Solution Explorer and start debugging.
     public class PlaneService : IPlaneService
     {
-        // генерация нового самолёта
-        void IPlaneService.GeneratePlane(int passengerCount, int fuelCount)
-        {
-            throw new NotImplementedException();
-        }
-
         // завершение движения - посадки или отлёта
         void IPlaneService.CompleteMove(string id, int zone)
         {
@@ -48,6 +42,16 @@ namespace Plane
             //TODO: послать обращение автобусу, чтобы отдал нам пассажиров
             // этот финт ушами делается из-за того, что в параметрах запроса не передать массив сложных объектов
             throw new NotImplementedException();
+        }
+
+        public void GoAway(string id)
+        {
+            lock (PlaneHandler.Planes)
+            {
+                Common.Plane plane = PlaneHandler.Planes.Find(x => x.Id.Equals(id));
+                if (plane == null) return;
+                plane.State = EntityState.WAITING_FOR_COMMAND;
+            }
         }
 
         // делается для того, чтобы заставить статические объекты инициализироваться

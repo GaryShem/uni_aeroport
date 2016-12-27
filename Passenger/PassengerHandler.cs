@@ -57,16 +57,12 @@ namespace Passenger
                                     passenger.State = EntityState.STANDING_BY;
                                     //запрос регистрации
                                     //TODO: сделать нормально запрос
-                                    string urlParameters = "?flightId=" + passenger.FlightId + "&passengerId=" +
-                                                           passenger.Id + "&cargo=" + passenger.CargoCount;
-                                    string url = "http://localhost:" + Common.Ports.RegStand +
-                                                 "/RegistrationStand.svc/" + "Register";
+                                    string urlParameters = "?flightId=" + passenger.FlightId + "&passengerId=" + passenger.Id + "&cargo=" + passenger.CargoCount;
+                                    string url = "http://localhost:" + Common.Ports.RegStand + "/RegistrationStand.svc/" + "Register";
                                     string result = Common.Util.MakeRequest(url + urlParameters);
                                     bool response = JsonConvert.DeserializeObject<bool>(result);
 
-                                    passenger.RegState = !response
-                                        ? RegistrationState.REJECTED
-                                        : RegistrationState.REGISTERED;
+                                    passenger.RegState = !response ? RegistrationState.REJECTED : RegistrationState.REGISTERED;
                                     passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 }
                                 else
@@ -75,7 +71,7 @@ namespace Passenger
                                     //TODO: сделать запрос визуализатору на выход из аэропорта
                                     passenger.State = EntityState.WAITING_FOR_COMMAND;
                                     passenger.RegState = RegistrationState.EXITING;
-                                    //TODO: удаление из глобального списка пассажира 
+                                    Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                                 }
                             }
 
@@ -84,7 +80,7 @@ namespace Passenger
                                 passenger.State = EntityState.MOVING;
                                 //TODO: сделать запрос визуализатору на выход из аэропорта
                                 passenger.State = EntityState.WAITING_FOR_COMMAND;
-                                //TODO: удаление из глобального списка пассажира 
+                                Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                             }
 
                             if (passenger.RegState == RegistrationState.REGISTERED)
@@ -102,7 +98,7 @@ namespace Passenger
                                     //TODO: сделать запрос визуализатору на из аэропорта
                                     passenger.State = EntityState.WAITING_FOR_COMMAND;
                                     passenger.RegState = RegistrationState.EXITING;
-                                    //TODO: удаление из глобального списка пассажира
+                                    Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                                 }
                             }
                         }
