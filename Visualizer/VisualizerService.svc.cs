@@ -15,7 +15,14 @@ namespace Visualizer
     {
         public void Spawn(Entity entity, string id, Zone zone, int cargoCount)
         {
-            throw new NotImplementedException();
+            switch (entity)
+            {
+                case Entity.BUS:
+                case Entity.CARGO_TRUCK:
+                case Entity.FUEL_TRUCK:
+                case Entity.PASSENGER:
+                    break;
+            }
         }
 
         public void SpawnPlane(Entity entity, string id, Zone zone, int cargoCount, int passengerCount)

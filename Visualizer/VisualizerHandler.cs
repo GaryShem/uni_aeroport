@@ -11,6 +11,11 @@ namespace Visualizer
     public static class VisualizerHandler
     {
         public static List<ExpandedZone> Zones = new List<ExpandedZone>();
+
+        public static List<LandVehicle> LandVehicles;
+        public static List<Passenger> Passengers;
+        public static List<Plane> Planes;
+
         private static Thread VisThread;
 
         static VisualizerHandler()
@@ -26,6 +31,10 @@ namespace Visualizer
             Zones.Add(new ExpandedZone(Zone.HANGAR_2, new Point(90,150), new Point(100, 160)));
             Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN, new Point(140, 120), new Point(150,130)));
 
+            LandVehicles = new List<LandVehicle>();
+            Passengers = new List<Passenger>();
+            Planes = new List<Plane>();
+
             VisThread = new Thread(HandleVisuals);
             VisThread.Start();
         }
@@ -33,7 +42,30 @@ namespace Visualizer
         {
             while (true)
             {
-                
+                Thread.Sleep(10);
+                lock (LandVehicles)
+                {
+                    foreach (LandVehicle landVehicle in LandVehicles)
+                    {
+                        
+                    }
+                }
+
+                lock (Passengers)
+                {
+                    foreach (Passenger passenger in Passengers)
+                    {
+                        
+                    }
+                }
+
+                lock (Planes)
+                {
+                    foreach (Plane plane in Planes)
+                    {
+                        
+                    }
+                }
             }
         }
     }

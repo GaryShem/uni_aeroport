@@ -17,12 +17,12 @@ namespace Common
             string str = MakeRequestAsync(URL).Result;
             return JToken.Parse(str).ToString();
         }
-        private static async Task<string> MakeRequestAsync(string URL)
+        public static async Task<string> MakeRequestAsync(string URL)
         {
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(URL);
-                using (HttpResponseMessage response = client.GetAsync(URL).Result)
+                using (HttpResponseMessage response = await client.GetAsync(URL))
                 using (HttpContent content = response.Content)
                 {
                     string result = await content.ReadAsStringAsync();
