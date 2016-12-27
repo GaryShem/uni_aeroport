@@ -58,7 +58,7 @@ namespace Passenger
                                     //запрос регистрации
                                     //TODO: сделать нормально запрос
                                     string urlParameters = "?flightId=" + passenger.FlightId + "&passengerId=" + passenger.Id + "&cargo=" + passenger.CargoCount;
-                                    string url = "http://localhost:" + Common.Ports.RegStand + "/RegistrationStand.svc/" + "Register";
+                                    string url = "http://localhost:" + Common.Ports.RegStand + "/RegistrationStandService.svc/" + "Register";
                                     string result = Common.Util.MakeRequest(url + urlParameters);
                                     bool response = JsonConvert.DeserializeObject<bool>(result);
 

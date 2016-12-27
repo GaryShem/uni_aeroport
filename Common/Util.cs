@@ -14,7 +14,8 @@ namespace Common
     {
         public static string MakeRequest(string URL)
         {
-            return JToken.Parse(MakeRequestAsync(URL).Result).ToString();
+            string str = MakeRequestAsync(URL).Result;
+            return JToken.Parse(str).ToString();
         }
         private static async Task<string> MakeRequestAsync(string URL)
         {
