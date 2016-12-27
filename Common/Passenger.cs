@@ -15,6 +15,7 @@ namespace Common
         public EntityState State { get; set; }
         public RegistrationState RegState { get; set; }
         public bool IsFlyingAway { get; set; }
+        public bool HoldingCargo { get; set; }
 
         public Passenger() { }
         public Passenger(string flightId, bool isOnPlane)
@@ -26,6 +27,7 @@ namespace Common
             State = EntityState.WAITING_FOR_COMMAND;
             RegState = isOnPlane ? RegistrationState.REGISTERED : RegistrationState.NOT_REGISTERED;
             IsFlyingAway = isOnPlane ? false : true;
+            HoldingCargo = isOnPlane ? false : true;
         }
     }
 }

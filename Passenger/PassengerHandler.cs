@@ -91,25 +91,40 @@ namespace Passenger
                                 if (passenger.IsFlyingAway)
                                 {
                                     passenger.State = EntityState.MOVING;
-                                    //TODO: сделать запрос визуализатору на движение в зону ожидания
-                                    passenger.CurrentZone = Zone.WAITING_AREA;
+                                    //TODO: сделать запрос визуализатору на движение в зону багажа
+                                    passenger.CurrentZone = Zone.CARGO_DROPOFF;
                                     passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 }
                                 else
                                 {
-                                    passenger.State = EntityState.MOVING;
-                                    //TODO: сделать запрос визуализатору на из аэропорта
-                                    passenger.State = EntityState.WAITING_FOR_COMMAND;
-                                    passenger.RegState = RegistrationState.EXITING;
+                                    Common.Util.Log(log, "Passenger " + passenger.Id + " removed");
                                     Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                                 }
                             }
-
-                            Common.Util.Log(log, "Passenger " + passenger.Id + " removed");
-                            Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                         }
 
-                        //если пассажир находится в зоне ожидания
+                        if (passenger.CurrentZone == Zone.CARGO_DROPOFF)
+                        {
+                            if (passenger.IsFlyingAway)
+                            {
+                                passenger.HoldingCargo = false;
+                                passenger.State = EntityState.MOVING;
+                                //TODO: сделать запрос визуализатору на движение в зону ожидания
+                                passenger.CurrentZone = Zone.WAITING_AREA;
+                                passenger.State = EntityState.WAITING_FOR_COMMAND;
+                            }
+                            else
+                            {
+                                passenger.HoldingCargo = false;
+                                passenger.State = EntityState.MOVING;
+                                //TODO: сделать запрос визуализатору на из аэропорта
+                                passenger.State = EntityState.WAITING_FOR_COMMAND;
+                                passenger.RegState = RegistrationState.EXITING;
+                                Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
+                            }
+                        }
+
+                            //если пассажир находится в зоне ожидания
                         if (passenger.CurrentZone == Zone.WAITING_AREA)
                         {
                             if (passenger.RegState == RegistrationState.REGISTERED)
@@ -124,13 +139,16 @@ namespace Passenger
                                 else
                                 {
                                     passenger.State = EntityState.MOVING;
-                                    //TODO: сделать запрос визуализатору на движение к регистрационной стойке
-                                    passenger.CurrentZone = Zone.REGISTRATION_STAND;
+                                    //TODO: сделать запрос визуализатору на движение к выдаче багажа
+                                    passenger.CurrentZone = Zone.CARGO_DROPOFF;
                                     passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 }
                             }
-                            Common.Util.Log(log, "Passenger " + passenger.Id + " removed");
-                            Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
+                            else
+                            {
+                                Common.Util.Log(log, "Passenger " + passenger.Id + " removed");
+                                Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
+                            }
                         }
                     }
                 }
