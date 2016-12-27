@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Web;
 using Common;
@@ -12,6 +13,8 @@ namespace Passenger
     {
         public static List<Common.Passenger> Passengers = new List<Common.Passenger>();
         private static Thread PassengerHandlerThread;
+
+        private static string log = "passenger_handler_log.txt";
 
         static PassengerHandler()
         {
@@ -101,6 +104,9 @@ namespace Passenger
                                     Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                                 }
                             }
+
+                            Common.Util.Log(log, "Passenger " + passenger.Id + " removed");
+                            Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                         }
 
                         //если пассажир находится в зоне ожидания
@@ -123,6 +129,8 @@ namespace Passenger
                                     passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 }
                             }
+                            Common.Util.Log(log, "Passenger " + passenger.Id + " removed");
+                            Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                         }
                     }
                 }
