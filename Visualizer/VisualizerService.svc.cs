@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using Common;
 
 namespace Visualizer
 {
@@ -12,9 +13,24 @@ namespace Visualizer
     // NOTE: In order to launch WCF Test Client for testing this service, please select VisualizerService.svc or VisualizerService.svc.cs at the Solution Explorer and start debugging.
     public class VisualizerService : IVisualizerService
     {
-        public string GetData(int value)
+        public void Spawn(Entity entity, string id, Zone zone, int cargoCount)
         {
-            return string.Format("You entered: {0}", value);
+            throw new NotImplementedException();
+        }
+
+        public void SpawnPlane(Entity entity, string id, Zone zone, int cargoCount, int passengerCount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Despawn(string id, Zone zone)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Move(string id, Zone zone)
+        {
+            throw new NotImplementedException();
         }
     }
 }

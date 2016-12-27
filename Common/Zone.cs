@@ -17,6 +17,7 @@ namespace Common
         FUEL_STATION,
         PLANE_SPAWN,
         BUS,
-        PLANE
+        PLANE,
+        CARGO_DROPOFF
     }
 }

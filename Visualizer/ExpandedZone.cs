@@ -11,13 +11,20 @@ namespace Visualizer
     {
         public Zone ZoneType { get; set; }
         public Point TopLeft { get; set; }
-        public Point BorromRight { get; set; }
+        public Point BottomRight { get; set; }
 
         public Point GetCoordinates()
         {
-            int x = RandomGen.Next(TopLeft.X, BorromRight.X);
-            int y = RandomGen.Next(TopLeft.Y, BorromRight.Y);
+            int x = RandomGen.Next(TopLeft.X, BottomRight.X);
+            int y = RandomGen.Next(TopLeft.Y, BottomRight.Y);
             return new Point(x, y);
+        }
+
+        public ExpandedZone(Zone zone, Point topLeft, Point bottomRight)
+        {
+            ZoneType = zone;
+            TopLeft = topLeft;
+            BottomRight = bottomRight;
         }
     }
 }

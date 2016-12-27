@@ -72,6 +72,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExpandedZone.cs" />
+    <Compile Include="LandVehicle.cs" />
+    <Compile Include="VisualizerHandler.cs" />
     <Compile Include="VisualizerService.svc.cs">
       <DependentUpon>VisualizerService.svc</DependentUpon>
     </Compile>
