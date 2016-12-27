@@ -30,7 +30,7 @@ namespace Common
             }
         }
 
-        private static void Log(string filename, string logString)
+        public static void Log(string filename, string logString)
         {
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(filename))
