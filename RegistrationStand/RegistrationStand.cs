@@ -41,12 +41,9 @@ namespace RegistrationStand
             {
                 RegistrationList list = RegistrationLists.Find(x => x.FlightId.Equals(flightId));
                 if (list == null) return;
-                lock (list)
-                {
-                    list.IsRegistrationOpened = false;
-                }
+                list.IsRegistrationOpened = false;
             }
-            
+
         }
 
         public static void DeleteList(string flightId)
