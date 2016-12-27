@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Common
 {
-    static class Ports
+    public static class Ports
     {
         public const int Plane = 8228;
         public const int Bus = 8258;

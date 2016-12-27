@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 
 namespace Common
 {
-    static class Util
+    public static class Util
     {
         public static string MakeRequest(string URL)
         {
