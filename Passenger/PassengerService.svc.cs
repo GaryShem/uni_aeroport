@@ -21,7 +21,6 @@ namespace Passenger
             passenger.CargoCount = 3;
             passenger.FlightId = Guid.NewGuid().ToString();
             string result = JsonConvert.SerializeObject(passenger);
-            Common.Passenger pass2 = JsonConvert.DeserializeObject<Common.Passenger>(result);
             return result;
         }
 

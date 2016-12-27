@@ -15,13 +15,14 @@ namespace Common
         public const int FuelCapacity = 100;
         public string Id { get; set; }
         public int PassengerCount { get; set; }
-        public Int32 CargoCount { get; set; }
+        public int CargoCount { get; set; }
         public int FuelCount { get; set; }
         public Zone CurrentZone { get; set; }
         public DateTime NextActionTime { get; set; }
         public EntityState State { get; set; }
         public DateTime? ActionTime { get; set; }
         public DateTime SpawnTime { get; set; }
+        public List<string> Passengers { get; set; }
         //TODO: добавить список пассажиров
         public Plane(){}
 
@@ -29,13 +30,13 @@ namespace Common
         {
             Id = id;
             PassengerCount = passengerCount;
-            //TODO: высчитывать груз по пассажирам
             CargoCount = cargoCount;
             FuelCount = fuelCount;
             State = EntityState.WAITING_FOR_COMMAND;
             CurrentZone = Zone.PLANE_SPAWN;
             ActionTime = null;
             SpawnTime = DateTime.Now;
+            Passengers = new List<string>();
         }
 
         public static Plane CreatePlane()

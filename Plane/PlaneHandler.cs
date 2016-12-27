@@ -54,6 +54,9 @@ namespace Plane
                             if (plane.State == EntityState.FINISHED_TASK)
                             {
                                 //TODO: убрать самолёт, сделать новый
+                                Planes.Remove(plane);
+                                plane = Common.Plane.CreatePlane();
+
                             }
                             // если самолёт ждёт разрешения на посадку, то проверяем свободные полосы
                             else if (plane.State == EntityState.WAITING_FOR_COMMAND)
@@ -93,21 +96,6 @@ namespace Plane
                             {
                                 continue;
                             }
-                        }
-                        // если есть свободная полоса, и самолёт ждёт получения команды, то ставим самолёту посадку в расписание, и ставим флаг,
-                        // что он уже получил команду и ждёт времени выполнения
-                        else if (activePlanes < 2 && plane.CurrentZone == Zone.PLANE_SPAWN && plane.State == EntityState.WAITING_FOR_COMMAND)
-                        {
-                            activePlanes++;
-                            int landingDelay = RandomGen.Next(10, 15);
-                            plane.ActionTime = DateTime.Now + TimeSpan.FromSeconds(landingDelay);
-                            plane.State = EntityState.STANDING_BY;
-                        }
-                        // если самолёт уже вставал в очередь на посадку, и его время пришло
-                        else if (plane.ActionTime != null && plane.ActionTime < DateTime.Now &&
-                            plane.State == EntityState.STANDING_BY && plane.CurrentZone == Zone.PLANE_SPAWN)
-                        {
-                            //TODO: запросить посадку
                         }
                         
                         // остальные действия, такие как принятие пассажиров или отлёт, а также регистрация в службе наземного контроля, выполняются в веб-методах

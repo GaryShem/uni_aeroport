@@ -14,6 +14,7 @@ namespace Plane
     // NOTE: In order to launch WCF Test Client for testing this service, please select PlaneService.svc or PlaneService.svc.cs at the Solution Explorer and start debugging.
     public class PlaneService : IPlaneService
     {
+        public static object lockObject = new object();
         // генерация нового самолёта
         void IPlaneService.GeneratePlane(int passengerCount, int fuelCount)
         {
