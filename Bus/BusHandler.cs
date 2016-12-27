@@ -12,6 +12,7 @@ namespace Bus
         static BusHandler()
         {
             BusHandlerThread = new Thread(HandleBus);
+            BusHandlerThread.Start();
         }
 
         private static void HandleBus()
