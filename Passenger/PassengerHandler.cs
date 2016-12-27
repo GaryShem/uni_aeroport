@@ -42,11 +42,19 @@ namespace Passenger
                         //если пассажир только-только сгенерирован в аэропорту
                         if (passenger.CurrentZone == Zone.PASSENGER_SPAWN)
                         {
-                            //TODO: отправить визуализатору 'отрисовать'? (или это уже где-то в другом месте)
-                            passenger.State = EntityState.MOVING;
-                            //TODO: сделать запрос визуализатору на движение к регистрационной стойке
-                            passenger.CurrentZone = Zone.REGISTRATION_STAND;
-                            passenger.State = EntityState.WAITING_FOR_COMMAND;
+                            if (passenger.RegState == RegistrationState.EXITING || passenger.RegState == RegistrationState.REJECTED)
+                            {
+                                //TODO: сделать запрос визуализатору DESPAWN
+                                Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
+                            }
+                            else
+                            {
+                                //TODO: отправить визуализатору 'отрисовать'? (или это уже где-то в другом месте)
+                                passenger.State = EntityState.MOVING;
+                                //TODO: сделать запрос визуализатору на движение к регистрационной стойке
+                                passenger.CurrentZone = Zone.REGISTRATION_STAND;
+                                passenger.State = EntityState.WAITING_FOR_COMMAND;
+                            }
                         }
 
                         //если пассажир находится у стойки регистрации
@@ -70,20 +78,20 @@ namespace Passenger
                                 }
                                 else
                                 {
-                                    passenger.State = EntityState.MOVING;
-                                    //TODO: сделать запрос визуализатору на выход из аэропорта
-                                    passenger.State = EntityState.WAITING_FOR_COMMAND;
                                     passenger.RegState = RegistrationState.EXITING;
-                                    Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
+                                    passenger.State = EntityState.MOVING;
+                                    //TODO: сделать запрос визуализатору на перемещение к спауну
+                                    passenger.CurrentZone = Zone.PASSENGER_SPAWN;
+                                    passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 }
                             }
 
                             if (passenger.RegState == RegistrationState.REJECTED)
                             {
                                 passenger.State = EntityState.MOVING;
-                                //TODO: сделать запрос визуализатору на выход из аэропорта
+                                //TODO: сделать запрос визуализатору на перемещение к спауну
+                                passenger.CurrentZone = Zone.PASSENGER_SPAWN;
                                 passenger.State = EntityState.WAITING_FOR_COMMAND;
-                                Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                             }
 
                             if (passenger.RegState == RegistrationState.REGISTERED)
@@ -116,11 +124,11 @@ namespace Passenger
                             else
                             {
                                 passenger.HoldingCargo = false;
-                                passenger.State = EntityState.MOVING;
-                                //TODO: сделать запрос визуализатору на из аэропорта
-                                passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 passenger.RegState = RegistrationState.EXITING;
-                                Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
+                                passenger.State = EntityState.MOVING;
+                                //TODO: сделать запрос визуализатору на перемещение к спауну
+                                passenger.CurrentZone = Zone.PASSENGER_SPAWN;
+                                passenger.State = EntityState.WAITING_FOR_COMMAND;
                             }
                         }
 
