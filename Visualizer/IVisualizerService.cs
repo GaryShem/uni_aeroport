@@ -25,8 +25,8 @@ namespace Visualizer
         [WebInvoke(Method = "GET",
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Bare,
-            UriTemplate = "Spawn?type={entity}&id={id}&zone={zone}&cargo={cargoCount}&passengerCount{passengerCount}")]
-        void SpawnPlane(Entity entity, string id, Zone zone, int cargoCount, int passengerCount);
+            UriTemplate = "Spawn?type={entity}&id={id}&zone={zone}&cargo={cargoCount}&passengerCount{passengerCount}&fuelCount={fuelCount}")]
+        void SpawnPlane(Entity entity, string id, Zone zone, int cargoCount, int passengerCount, int fuelCount);
 
         [OperationContract]
         [WebInvoke(Method = "GET",
@@ -40,6 +40,6 @@ namespace Visualizer
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "Move?id={id}&zone={zone}")]
-        void Move(string id, Zone zone);
+        void Move(Entity entity, string id, Zone zone);
     }
 }

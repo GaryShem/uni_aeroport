@@ -9,8 +9,8 @@ namespace Visualizer
     public class LandVehicle
     {
         public Entity VehicleType { get; set; }
-        public ExpandedZone CurrentZone { get; set; }
-        public ExpandedZone TargetZone { get; set; }
+        public string Id { get; set; }
+        public Zone CurrentZone { get; set; }
         public EntityState State { get; set; }
         public int Cargo { get; set; }
     }

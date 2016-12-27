@@ -12,9 +12,9 @@ namespace Visualizer
     {
         public static List<ExpandedZone> Zones = new List<ExpandedZone>();
 
-        public static List<LandVehicle> LandVehicles;
-        public static List<Passenger> Passengers;
-        public static List<Plane> Planes;
+        public static List<Tuple<LandVehicle, Point, Point>> LandVehicles;
+        public static List<Tuple<Passenger, Point, Point>> Passengers;
+        public static List<Tuple<Plane, Point, Point>> Planes;
 
         private static Thread VisThread;
 
@@ -31,9 +31,9 @@ namespace Visualizer
             Zones.Add(new ExpandedZone(Zone.HANGAR_2, new Point(90,150), new Point(100, 160)));
             Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN, new Point(140, 120), new Point(150,130)));
 
-            LandVehicles = new List<LandVehicle>();
-            Passengers = new List<Passenger>();
-            Planes = new List<Plane>();
+            LandVehicles = new List<Tuple<LandVehicle, Point, Point>>();
+            Passengers = new List<Tuple<Passenger, Point, Point>>();
+            Planes = new List<Tuple<Plane, Point, Point>>();
 
             VisThread = new Thread(HandleVisuals);
             VisThread.Start();
@@ -45,7 +45,7 @@ namespace Visualizer
                 Thread.Sleep(10);
                 lock (LandVehicles)
                 {
-                    foreach (LandVehicle landVehicle in LandVehicles)
+                    foreach (Tuple<LandVehicle, Point, Point> landVehicleTuple in LandVehicles)
                     {
                         
                     }
@@ -53,7 +53,7 @@ namespace Visualizer
 
                 lock (Passengers)
                 {
-                    foreach (Passenger passenger in Passengers)
+                    foreach (Tuple<Passenger, Point, Point> passengerTuple in Passengers)
                     {
                         
                     }
@@ -61,7 +61,10 @@ namespace Visualizer
 
                 lock (Planes)
                 {
-                    foreach (Plane plane in Planes)
+                    foreach (Tuple<Plane, Point, Point> planeTuple in Planes)
+                    {
+                        
+                    }
                     {
                         
                     }
