@@ -7,6 +7,7 @@ using System.ServiceModel.Web;
 using System.Text;
 using Common;
 using Newtonsoft.Json;
+using RegistrationStand;
 
 namespace Passenger
 {
@@ -35,7 +36,10 @@ namespace Passenger
                 PassengerHandler.Passengers.AddRange(groundPassengers);
             }
 
-            return JsonConvert.SerializeObject(planePassengers);
+            RegistrationList registrationList = new RegistrationList(flightId);
+            registrationList.Passengers = planePassengers.Select(x => x.Id).ToList();
+            registrationList.CargoCount = planePassengers.Sum(x => x.CargoCount);
+            return JsonConvert.SerializeObject(registrationList);
         }
 
         public List<Common.Passenger> GeneratePlanePassengers(string flightId, int count)

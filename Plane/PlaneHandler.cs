@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using Common;
+using Newtonsoft.Json;
+using RegistrationStand;
 
 namespace Plane
 {
@@ -13,12 +15,25 @@ namespace Plane
         public static List<Common.Plane> Planes { get; set; }
         private static Thread PlaneHandlerThread;
 
+        private static Common.Plane GeneratePlane()
+        {
+            int passengerCount = RandomGen.Next(1, Common.Plane.PassengerCapacity + 1);
+            string planeId = Guid.NewGuid().ToString();
+            string URL = String.Format("http://localhost:{0}/PassengerService.svc/GeneratePassengers?id={1}&count={2}", Ports.Passenger, planeId, passengerCount);
+            string passengerString = Util.MakeRequest(URL);
+            RegistrationList registrationList = JsonConvert.DeserializeObject<RegistrationList>(passengerString);
+            int fuelCount = RandomGen.Next(Common.Plane.MIN_GENERATED_FUEL, Common.Plane.MAX_GENERATED_FUEL + 1);
+
+            Common.Plane plane = new Common.Plane(planeId, registrationList.Passengers, registrationList.CargoCount, fuelCount);
+            return plane;
+        }
+
         static PlaneHandler()
         {
             Planes = new List<Common.Plane>(4);
             for (int i = 0; i < 4; i++)
             {
-                Planes.Add(Common.Plane.CreatePlane());
+                Planes.Add(GeneratePlane());
             }
             PlaneHandlerThread = new Thread(HandlePlanes);
             PlaneHandlerThread.Start();
@@ -55,7 +70,8 @@ namespace Plane
                             {
                                 //TODO: убрать самолёт, сделать новый
                                 Planes.Remove(plane);
-                                plane = Common.Plane.CreatePlane();
+                                plane = GeneratePlane();
+                                Planes.Add(plane);
 
                             }
                             // если самолёт ждёт разрешения на посадку, то проверяем свободные полосы

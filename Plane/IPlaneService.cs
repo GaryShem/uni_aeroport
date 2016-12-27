@@ -17,29 +17,36 @@ namespace Plane
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
-             BodyStyle = WebMessageBodyStyle.Wrapped,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "GeneratePlane?passengerCount={passengerCount}&fuelCount={fuelCount}")]
         void GeneratePlane(int passengerCount, int fuelCount);
 
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
-             BodyStyle = WebMessageBodyStyle.Wrapped,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "CompleteMove?id={id}&zone={zone}")]
         void CompleteMove(string id, int zone);
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
-             BodyStyle = WebMessageBodyStyle.Wrapped,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "GetAllPlanes")]
         string GetAllPlanes();
 
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
-             BodyStyle = WebMessageBodyStyle.Wrapped,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "LoadPassengers?id={id}")]
         void LoadPassengers(string id);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "Start")]
+        void Start();
     }
     
 }
