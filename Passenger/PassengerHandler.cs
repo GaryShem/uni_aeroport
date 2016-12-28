@@ -33,15 +33,16 @@ namespace Passenger
                     {
                         Common.Passenger passenger = Passengers[i];
 
-                        // если пассажир выполняет дейятвие, то пропускаем его
+                        // если пассажир выполн¤ет дей¤твие, то пропускаем его
                         if (passenger.State == EntityState.MOVING)
                         {
                             continue;
                         }
 
-                        //если пассажир только-только сгенерирован в аэропорту
+                        //если пассажир на точке спавна в аэропорту
                         if (passenger.CurrentZone == Zone.PASSENGER_SPAWN)
                         {
+                            //если пассажир уходит (отказ или прилЄт)
                             if (passenger.RegState == RegistrationState.EXITING || passenger.RegState == RegistrationState.REJECTED)
                             {
                                 //TODO: сделать запрос визуализатору DESPAWN
@@ -49,7 +50,7 @@ namespace Passenger
                                     Ports.Visualizer, passenger.Id);
                                 Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                             }
-                            else
+                            else //если пассажир только по¤вилс¤
                             {
                                 string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Spawn?type={1}&id={2}&zone={3}&cargo={4}",
                                     Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.PASSENGER_SPAWN, passenger.CargoCount);
@@ -64,14 +65,16 @@ namespace Passenger
                                 //                                passenger.CurrentZone = Zone.REGISTRATION_STAND;
                                 //                                passenger.State = EntityState.WAITING_FOR_COMMAND;
                             }
+                            //continue;
                         }
 
-                        //если пассажир находится у стойки регистрации
+                        //если пассажир находитс¤ у стойки регистрации
                         if (passenger.CurrentZone == Zone.REGISTRATION_STAND)
                         {
                             //если пассажир незарегистрирован
                             if (passenger.RegState == RegistrationState.NOT_REGISTERED)
                             {
+                                //если пассажир улетающий
                                 if (passenger.IsFlyingAway)
                                 {
                                     passenger.State = EntityState.STANDING_BY;
@@ -87,8 +90,12 @@ namespace Passenger
                                     passenger.RegState = response ? RegistrationState.REGISTERED : RegistrationState.REJECTED;
                                     passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 }
-                                else
+                                else //если пассажир прилетающий
                                 {
+                                    //так не должо быть
+                                    Common.Util.Log(log,
+                                        "Passenger " + passenger.Id + " is't flying away, but go to registration!");
+                                    Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                                     passenger.RegState = RegistrationState.EXITING;
                                     //TODO: сделать запрос визуализатору на перемещение к спауну
                                     string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
@@ -100,6 +107,7 @@ namespace Passenger
                                 }
                             }
 
+                            //если пассажиру отказано в регистрации
                             if (passenger.RegState == RegistrationState.REJECTED)
                             {
                                 passenger.State = EntityState.MOVING;
@@ -110,8 +118,10 @@ namespace Passenger
 //                                passenger.State = EntityState.WAITING_FOR_COMMAND;
                             }
 
+                            //если пассажир уже зарегистрирован
                             if (passenger.RegState == RegistrationState.REGISTERED)
                             {
+                                //если пассажир улетающий
                                 if (passenger.IsFlyingAway)
                                 {
                                     passenger.State = EntityState.MOVING;
@@ -122,7 +132,7 @@ namespace Passenger
 //                                    passenger.CurrentZone = Zone.CARGO_DROPOFF;
 //                                    passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 }
-                                else
+                                else //если пассажир прилетающий
                                 {
                                     Common.Util.Log(log, "Passenger " + passenger.Id + " removed");
                                     string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Despawn?id={1}",
@@ -131,10 +141,13 @@ namespace Passenger
                                     Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                                 }
                             }
+                            //continue;
                         }
 
+                        //пассажир находитс¤ у стойки с багажом
                         if (passenger.CurrentZone == Zone.CARGO_DROPOFF)
                         {
+                            //если пассажир улетающий
                             if (passenger.IsFlyingAway)
                             {
                                 passenger.HoldingCargo = false;
@@ -146,7 +159,7 @@ namespace Passenger
 //                                passenger.CurrentZone = Zone.WAITING_AREA;
 //                                passenger.State = EntityState.WAITING_FOR_COMMAND;
                             }
-                            else
+                            else //если пассажир прилетающий
                             {
                                 passenger.HoldingCargo = false;
                                 
@@ -159,13 +172,31 @@ namespace Passenger
 //                                passenger.CurrentZone = Zone.PASSENGER_SPAWN;
 //                                passenger.State = EntityState.WAITING_FOR_COMMAND;
                             }
+                            //continue;
                         }
 
-                            //если пассажир находится в зоне ожидания
+                        //если пассажир на автобусной остановке
+                        if (passenger.CurrentZone == Zone.BUS_STATION)
+                        {
+                            //если пассажир прилетающий
+                            if (!passenger.IsFlyingAway)
+                            {
+                                //TODO: отправить визуализатору SPAWN
+                                passenger.State = EntityState.MOVING;
+                                //TODO: сделать запрос визуализатору на движение в зону ожидани¤
+                                passenger.CurrentZone = Zone.WAITING_AREA;
+                                passenger.State = EntityState.WAITING_FOR_COMMAND;
+                            }
+                            //continue;
+                        }
+
+                        //если пассажир находитс¤ в зоне ожидани¤
                         if (passenger.CurrentZone == Zone.WAITING_AREA)
                         {
+                            //если пассажир зарегистрирован
                             if (passenger.RegState == RegistrationState.REGISTERED)
                             {
+                                //если пассажир улетающий
                                 if (passenger.IsFlyingAway)
                                 {
 //                                    passenger.State = EntityState.MOVING;
@@ -182,7 +213,7 @@ namespace Passenger
                                     //////////////////////////////////////////////////////////////////////////
                                     continue;
                                 }
-                                else
+                                else //прилетающий
                                 {
                                     //TODO: сделать запрос визуализатору на движение к выдаче багажа
                                     string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
@@ -195,9 +226,11 @@ namespace Passenger
                             }
                             else
                             {
-                                Common.Util.Log(log, "Passenger " + passenger.Id + " removed");
+                                //так не должно быть
+                                Common.Util.Log(log, "Passenger " + passenger.Id + " in waiting_area, but not registered!");
                                 Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                             }
+                            //continue;
                         }
                     }
                 }
