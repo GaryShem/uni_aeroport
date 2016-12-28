@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Net;
@@ -12,6 +13,7 @@ namespace Common
 {
     public static class Util
     {
+//        private static string logFile = @"F:\Programming\CPP\Winsock\Aeroport\commands.txt";
         public static string MakeRequest(string URL)
         {
             string str = MakeRequestAsync(URL).Result;
@@ -33,11 +35,10 @@ namespace Common
 
         public static void Log(string filename, string logString)
         {
-            using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(filename))
-            {
-                file.WriteLine(logString);
-            }
+            System.IO.StreamWriter file = new System.IO.StreamWriter(filename);
+            
+            file.WriteLine(logString);
+            file.Close();
         }
     }
 }

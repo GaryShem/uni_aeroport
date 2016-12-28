@@ -31,7 +31,7 @@ namespace Visualizer
             Zones.Add(new ExpandedZone(Zone.BUS_STATION, new Point(287,486), new Point(287+56,486+78)));
             Zones.Add(new ExpandedZone(Zone.FUEL_STATION, new Point(637,533), new Point(637+148,533+134)));
             Zones.Add(new ExpandedZone(Zone.CARGO_AREA, new Point(306,317), new Point(306+36,317+42)));
-            Zones.Add(new ExpandedZone(Zone.CARGO_DROPOFF, new Point(192,320), new Point(192+39,210+26)));
+            Zones.Add(new ExpandedZone(Zone.CARGO_DROPOFF, new Point(192,320), new Point(192+39,320+26)));
             Zones.Add(new ExpandedZone(Zone.HANGAR_1, new Point(557,120), new Point(557+21,120+24)));
             Zones.Add(new ExpandedZone(Zone.HANGAR_2, new Point(788,268), new Point(788+20,268+22)));
             Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN, new Point(2004,182), new Point(2004+61,182+55)));
@@ -60,7 +60,7 @@ namespace Visualizer
                         int diffX = targetPoint.X - currentPoint.X;
                         diffX = Math.Min(5, Math.Abs(targetPoint.X - currentPoint.X))*Math.Sign(diffX);
                         int diffY = targetPoint.Y - currentPoint.Y;
-                        diffY = Math.Min(5, Math.Abs(targetPoint.Y - currentPoint.Y)) * Math.Sign(diffY);
+                        diffY = Math.Min(5, Math.Abs(targetPoint.Y - currentPoint.Y))*Math.Sign(diffY);
                         currentPoint.X += diffX;
                         currentPoint.Y += diffY;
                         landVehicleTriple.Item2 = currentPoint;
@@ -82,10 +82,8 @@ namespace Visualizer
                             continue;
                         Point currentPoint = passengerTriple.Item2;
                         Point targetPoint = passengerTriple.Item3;
-                        int diffX = targetPoint.X - currentPoint.X;
-                        diffX = Math.Sign(diffX);
-                        int diffY = targetPoint.Y - currentPoint.Y;
-                        diffY = Math.Sign(diffY);
+                        int diffX = Math.Sign(targetPoint.X - currentPoint.X);
+                        int diffY = Math.Sign(targetPoint.Y - currentPoint.Y);
                         passengerTriple.Item2 = new Point(currentPoint.X + diffX, currentPoint.Y + diffY);
                         if (passengerTriple.Item2.X == targetPoint.X && passengerTriple.Item2.Y == targetPoint.Y)
                         {
@@ -128,23 +126,23 @@ namespace Visualizer
 
         public static async void CompleteMove(Entity entity, string id, Zone zone)
         {
-            string URL = "http://localhost:";
+            string URL;
             switch (entity)
             {
                 case Entity.PLANE:
-                    URL += String.Format("{0}/PlaneService.svc", Ports.Plane);
+                    URL = ServiceStrings.Plane;
                     break;
                 case Entity.PASSENGER:
-                    URL += String.Format("{0}/PassengerService.svc", Ports.Passenger);
+                    URL = ServiceStrings.Passenger;
                     break;
                 case Entity.FUEL_TRUCK:
-                    URL += String.Format("{0}/FuelTruckService.svc", Ports.FuelTruck);
+                    URL = ServiceStrings.Fuel;
                     break;
                 case Entity.CARGO_TRUCK:
-                    URL += String.Format("{0}/CargoTruckService.svc", Ports.CargoTruck);
+                    URL = ServiceStrings.Cargo;
                     break;
                 case Entity.BUS:
-                    URL += String.Format("{0}/BusService.svc", Ports.Bus);
+                    URL = ServiceStrings.Bus;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(entity), entity, null);

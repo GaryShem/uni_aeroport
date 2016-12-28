@@ -45,12 +45,9 @@ namespace Passenger
         public void CompleteMove(string id, int zoneNum)
         {
             Zone zone = (Zone) zoneNum;
-            lock (PassengerHandler.Passengers)
-            {
                 Common.Passenger passenger = PassengerHandler.Passengers.Find(x => x.Id.Equals(id));
                 passenger.CurrentZone = zone;
                 passenger.State = EntityState.WAITING_FOR_COMMAND;
-            }
         }
 
         public string GetAllPassengers()
