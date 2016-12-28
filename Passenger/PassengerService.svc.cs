@@ -42,6 +42,25 @@ namespace Passenger
             return JsonConvert.SerializeObject(registrationList);
         }
 
+        public void CompleteMove(string id, int zoneNum)
+        {
+            Zone zone = (Zone) zoneNum;
+            lock (PassengerHandler.Passengers)
+            {
+                Common.Passenger passenger = PassengerHandler.Passengers.Find(x => x.Id.Equals(id));
+                passenger.CurrentZone = zone;
+                passenger.State = EntityState.WAITING_FOR_COMMAND;
+            }
+        }
+
+        public string GetAllPassengers()
+        {
+            lock (PassengerHandler.Passengers)
+            {
+                return JsonConvert.SerializeObject(PassengerHandler.Passengers);
+            }
+        }
+
         public List<Common.Passenger> GeneratePlanePassengers(string flightId, int count)
         {
             List<Common.Passenger> result = new List<Common.Passenger>();

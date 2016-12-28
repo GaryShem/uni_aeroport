@@ -18,9 +18,9 @@ namespace Common
         public int CargoCount { get; set; }
         public int FuelCount { get; set; }
         public Zone CurrentZone { get; set; }
-        public DateTime NextActionTime { get; set; }
+        public bool HasAction { get; set; }
         public EntityState State { get; set; }
-        public DateTime? ActionTime { get; set; }
+        public DateTime ActionTime { get; set; }
         public DateTime SpawnTime { get; set; }
         public List<string> Passengers { get; set; }
         //TODO: добавить список пассажиров
@@ -33,7 +33,7 @@ namespace Common
             FuelCount = fuelCount;
             State = EntityState.WAITING_FOR_COMMAND;
             CurrentZone = Zone.PLANE_SPAWN;
-            ActionTime = null;
+            HasAction = false;
             SpawnTime = DateTime.Now;
             Passengers = new List<string>(passengerIds);
         }

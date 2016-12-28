@@ -26,5 +26,19 @@ namespace Passenger
              BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "GeneratePassengers?id={flightId}&count={passengerCount}")]
         string GeneratePassengers(string flightId, int passengerCount);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "CompleteMove?id={id}&zone={zoneNum}")]
+        void CompleteMove(string id, int zoneNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GetAllPassengers")]
+        string GetAllPassengers();
     }
 }

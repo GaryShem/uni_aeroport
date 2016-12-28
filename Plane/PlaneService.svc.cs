@@ -20,6 +20,7 @@ namespace Plane
             lock (PlaneHandler.Planes)
             {
                 Common.Plane plane = PlaneHandler.Planes.Find(x => x.Id.Equals(id));
+                PlaneHandler.FreeHangar(plane.CurrentZone);
                 plane.CurrentZone = (Zone) zone;
                 plane.State = EntityState.FINISHED_TASK;
             }

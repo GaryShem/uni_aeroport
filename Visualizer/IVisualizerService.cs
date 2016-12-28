@@ -18,28 +18,49 @@ namespace Visualizer
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Bare,
-             UriTemplate = "Spawn?type={entity}&id={id}&zone={zone}&cargo={cargoCount}")]
-        void Spawn(Entity entity, string id, Zone zone, int cargoCount);
+             UriTemplate = "Spawn?type={entityNum}&id={id}&zone={zoneNum}&cargo={cargoCount}")]
+        void Spawn(int entityNum, string id, int zoneNum, int cargoCount);
 
         [OperationContract]
         [WebInvoke(Method = "GET",
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Bare,
-            UriTemplate = "Spawn?type={entity}&id={id}&zone={zone}&cargo={cargoCount}&passengerCount{passengerCount}&fuelCount={fuelCount}")]
-        void SpawnPlane(Entity entity, string id, Zone zone, int cargoCount, int passengerCount, int fuelCount);
+            UriTemplate = "SpawnPlane?type={entityNum}&id={id}&zone={zoneNum}&cargo={cargoCount}&passengerCount={passengerCount}&fuelCount={fuelCount}")]
+        void SpawnPlane(int entityNum, string id, int zoneNum, int cargoCount, int passengerCount, int fuelCount);
 
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Bare,
-             UriTemplate = "Despawn?id={id}&zone={zone}")]
-        void Despawn(string id, Zone zone);
+             UriTemplate = "Despawn?id={id}")]
+        void Despawn(string id);
 
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Bare,
-             UriTemplate = "Move?id={id}&zone={zone}")]
-        void Move(Entity entity, string id, Zone zone);
+             UriTemplate = "Move?type={entityNum}&id={id}&zone={zoneNum}")]
+        void Move(int entityNum, string id, int zoneNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GetAllVehicles")]
+        string GetAllVehicles();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GetAllPlanes")]
+        string GetAllPlanes();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GetAllPassengers")]
+        string GetAllPassengers();
     }
 }

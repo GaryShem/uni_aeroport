@@ -55,6 +55,8 @@
     <Compile Include="RandomGen.cs" />
     <Compile Include="RegistrationList.cs" />
     <Compile Include="RegistrationState.cs" />
+    <Compile Include="ServiceStrings.cs" />
+    <Compile Include="Triple.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Zone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
