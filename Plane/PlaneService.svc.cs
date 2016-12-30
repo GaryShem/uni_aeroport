@@ -35,15 +35,7 @@ namespace Plane
                 return result;
             }
         }
-
-        // сказать самолёту, что автобус готов отдавать пассажиров на нужный рейс
-        // самолёт в ответ попросит автобус погрузить пассажиров на нужный рейс
-        public void LoadPassengers(string id)
-        {
-            //TODO: послать обращение автобусу, чтобы отдал нам пассажиров
-            // этот финт ушами делается из-за того, что в параметрах запроса не передать массив сложных объектов
-            throw new NotImplementedException();
-        }
+        
 
         public void GoAway(string id)
         {
@@ -53,6 +45,49 @@ namespace Plane
                 if (plane == null) return;
                 plane.State = EntityState.WAITING_FOR_COMMAND;
             }
+        }
+
+        public void TakePassengersFromBus(string id)
+        {
+            Common.Plane plane;
+            lock (PlaneHandler.Planes)
+            {
+                plane = PlaneHandler.Planes.Find(x => x.Id.Equals(id));
+            }
+            string URL = String.Format("{0}/UnloadPassengers", ServiceStrings.Bus);
+            string response = Util.MakeRequest(URL);
+            List<string> passengers = JsonConvert.DeserializeObject<List<string>>(response);
+            foreach (string passenger in passengers)
+            {
+                plane.Passengers.Add(passenger);
+                URL = String.Format("{0}/CompleteMove?id={1}&zone={2}", ServiceStrings.Passenger, passenger, (int)Zone.PLANE);
+                Util.MakeRequest(URL);
+            }
+        }
+
+        public string UnloadPassengers(string flightId, int count)
+        {
+            List<string> result = new List<string>();
+            Common.Plane plane;
+            lock (PlaneHandler.Planes)
+            {
+                plane = PlaneHandler.Planes.Find(x => x.Id.Equals(flightId));
+            }
+            for (int i = 0; i < count; i++)
+            {
+                if (plane.Passengers.Count <= 0)
+                {
+                    break;
+                }
+                result.Add(plane.Passengers[0]);
+                plane.Passengers.RemoveAt(0);
+            }
+            if (plane.Passengers.Count == 0)
+            {
+                string URL = String.Format("{0}/FinishUnloadingPassengers?id={1}&zone={2}", ServiceStrings.GrControl, plane.Id, (int) plane.CurrentZone);
+                Util.MakeRequest(URL);
+            }
+            return JsonConvert.SerializeObject(result);
         }
 
         // делается для того, чтобы заставить статические объекты инициализироваться

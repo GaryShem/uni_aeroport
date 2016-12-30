@@ -38,6 +38,10 @@ namespace Passenger
                         {
                             continue;
                         }
+                        if (passenger.CurrentZone == Zone.BUS || passenger.CurrentZone == Zone.PLANE)
+                        {
+                            continue;
+                        }
 
                         //если пассажир на точке спавна в аэропорту
                         if (passenger.CurrentZone == Zone.PASSENGER_SPAWN)

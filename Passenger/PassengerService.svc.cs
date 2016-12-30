@@ -50,6 +50,41 @@ namespace Passenger
                 passenger.State = EntityState.WAITING_FOR_COMMAND;
         }
 
+        public void TakePassengersFromBus()
+        {
+            string URL = String.Format("{0}/UnloadPassengers", ServiceStrings.Bus);
+            string response = Util.MakeRequest(URL);
+            List<string> passengerList = JsonConvert.DeserializeObject<List<String>>(response);
+
+            foreach (string passengerId in passengerList)
+            {
+                //"Spawn?type={entityNum}&id={id}&zone={zoneNum}&cargo={cargoCount}"
+                Common.Passenger passenger;
+                passenger = PassengerHandler.Passengers.Find(x => x.Id.Equals(passengerId));
+
+                CompleteMove(passengerId, (int) Zone.WAITING_AREA);
+                URL = String.Format("{0}/Spawn?type={1}&id={2}&zone={3}&cargo={4}", ServiceStrings.Vis,
+                    (int) Entity.PASSENGER, passenger.Id, (int) passenger.CurrentZone, passenger.CargoCount);
+                Util.MakeRequest(URL);
+            }
+        }
+
+        public string GivePassengersToBus(string flightId)
+        {
+            List<string> passengerList =
+                PassengerHandler.Passengers.Where(x => x.Id.Equals(flightId) && x.CurrentZone == Zone.WAITING_AREA)
+                    .Take(2)
+                    .Select(x => x.Id)
+                    .ToList();
+            foreach (string passengerId in passengerList)
+            {
+                CompleteMove(passengerId, (int)Zone.BUS);
+                string URL = String.Format("{0}/Despawn?id={1}", ServiceStrings.Vis, passengerId);
+                Util.MakeRequest(URL);
+            }
+            return JsonConvert.SerializeObject(passengerList);
+        }
+
         public string GetAllPassengers()
         {
             lock (PassengerHandler.Passengers)

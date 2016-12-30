@@ -5,6 +5,9 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Web.UI.WebControls;
+using Common;
+using Newtonsoft.Json;
 
 namespace Bus
 {
@@ -12,10 +15,29 @@ namespace Bus
     // NOTE: In order to launch WCF Test Client for testing this service, please select BusService.svc or BusService.svc.cs at the Solution Explorer and start debugging.
     public class BusService : IBusService
     {
-
-        public string LoadPassengers(string flightId)
+        private static int passengerTransferCount = 2;
+        public string UnloadPassengers()
         {
-            throw new NotImplementedException();
+            List<string> result = new List<string>();
+            for (int i = 0; i < passengerTransferCount; i++)
+            {
+                if (Bus.Passengers.Count > 0)
+                {
+                    result.Add(Bus.Passengers[0]);
+                    Bus.Passengers.RemoveAt(0);
+                }
+            }
+            return JsonConvert.SerializeObject(result);
+        }
+
+        public void AddAction(string flightId, int zoneNum, int actionNum)
+        {
+            if ((Zone)zoneNum != Zone.HANGAR_1 && (Zone)zoneNum != Zone.HANGAR_2)
+                throw new ArgumentOutOfRangeException(nameof(zoneNum));
+            lock (Bus.Commands)
+            {
+                Bus.Commands.Add(new Tuple<string, Zone, PlaneServiceStage>(flightId, (Zone)zoneNum, (PlaneServiceStage)actionNum));
+            }
         }
     }
 }

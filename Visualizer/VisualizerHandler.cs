@@ -34,7 +34,8 @@ namespace Visualizer
             Zones.Add(new ExpandedZone(Zone.CARGO_DROPOFF, new Point(192,320), new Point(192+39,320+26)));
             Zones.Add(new ExpandedZone(Zone.HANGAR_1, new Point(557,120), new Point(557+21,120+24)));
             Zones.Add(new ExpandedZone(Zone.HANGAR_2, new Point(788,268), new Point(788+20,268+22)));
-            Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN, new Point(2004,182), new Point(2004+61,182+55)));
+            Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN_1, new Point(2004,182), new Point(2004+61,182+55)));
+            Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN_2, new Point(2004, 182), new Point(2004 + 61, 182 + 55)));
 
             LandVehicles = new List<Triple<LandVehicle, Point, Point, Zone>>();
             Passengers = new List<Triple<Passenger, Point, Point, Zone>>();

@@ -51,6 +51,7 @@
     <Compile Include="EntityState.cs" />
     <Compile Include="Passenger.cs" />
     <Compile Include="Plane.cs" />
+    <Compile Include="PlaneServiceStage.cs" />
     <Compile Include="Ports.cs" />
     <Compile Include="RandomGen.cs" />
     <Compile Include="RegistrationList.cs" />

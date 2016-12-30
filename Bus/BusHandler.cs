@@ -27,14 +27,13 @@ namespace Bus
 
     public static class Bus
     {
-
         public const int MAX_COUNT_OF_PASSENGERS = 6;
         public const int TAKE_PASSENGERS = 2;
         public const int TIME_TO_SLEEP = 1000;
         public static int PassengersCount = 0;
         public static Zone CurrentZone = Zone.BUS_STATION;
         public static EntityState State = EntityState.WAITING_FOR_COMMAND;
-        public static List<Command> Commands = new List<Command>();
+        public static List<Tuple<string, Zone, PlaneServiceStage>> Commands = new List<Tuple<string, Zone, PlaneServiceStage>>();
         public static List<string> Passengers = new List<string>();
 
     }
@@ -47,13 +46,48 @@ namespace Bus
             BusHandlerThread.Start();
         }
 
+        private static void LoadPassengersToPlane(string flightId)
+        {
+            string URL = String.Format("{0}/TakePassengersFromBus?flightId={1}&count={2}", ServiceStrings.Plane, flightId, Bus.TAKE_PASSENGERS);
+            Util.MakeRequest(URL);
+        }
+
+        private static void TakePassengersFromPlane(string flightId)
+        {
+            string URL = String.Format("{0}/UnloadPassengers?flightId={1}&count={2}", ServiceStrings.Plane, flightId, Bus.TAKE_PASSENGERS);
+            string response = Util.MakeRequest(URL);
+            List<string> passengerList = JsonConvert.DeserializeObject<List<string>>(response);
+            foreach (string passenger in passengerList)
+            {
+                Bus.Passengers.Add(passenger);
+                URL = String.Format("{0}/CompleteMove?id={1}&zone={2}", ServiceStrings.Passenger, passenger, (int)Zone.BUS);
+                Util.MakeRequest(URL);
+            }
+        }
+
+        private static void GivePassengersToStation()
+        {
+            string URL = String.Format("{0}/TakePassengersFromBus", ServiceStrings.Passenger);
+            Util.MakeRequest(URL);
+        }
+
+        private static void TakePassengersFromStation(string flightId)
+        {
+            //GivePassengersToBus?flightId={flightId}
+            string URL = String.Format("{0}/GivePassengersToBus?flightId={1}", ServiceStrings.Passenger, flightId);
+            string response = Util.MakeRequest(URL);
+            List<string> passengerIdList = JsonConvert.DeserializeObject<List<string>>(response);
+            //деспавнит служба пассажиров, поэтому здесь просто добавляем в автобус
+            Bus.Passengers.AddRange(passengerIdList);
+        }
+
         private static void HandleBus()
         {
             while (true)
             {
+                Thread.Sleep(1000);
                 if (Bus.Commands.Count == 0)//если список команд пуст
                 {
-                    Thread.Sleep(1000);
                     continue;
                 }
                 if (Bus.State == EntityState.MOVING)
@@ -63,7 +97,7 @@ namespace Bus
 
                 if (Bus.CurrentZone == Zone.BUS_STATION)//если на автобусной станции
                 {
-                    if (Bus.Commands[0].isUnload == true)//если на разгрузке
+                    if (Bus.Commands[0].Item3 == PlaneServiceStage.UNLOAD_PASSENGERS)//если на разгрузке
                     {
                         if (Bus.PassengersCount > 0)//если еще есть пассажиры внутри
                         {
@@ -98,37 +132,37 @@ namespace Bus
 
                         {
                             //TODO Вcтавить верный запрос к СДК с вопросом завершил ли самолет с данным рейсом разгрузку 
-                            string checkSDK = "...?planeID=" + Bus.Commands[0].PlaneId;
-                            string checkresult = Util.MakeRequest(checkSDK);
-                            bool unloadfinished = JsonConvert.DeserializeObject<bool>(checkresult);
-                            if (unloadfinished) //если разгрузка закончена(самолет пуст)
-                            {
-                                //завершаем действие
-                                lock (Bus.Commands)
-                                {
-                                    Bus.Commands.RemoveAt(0);
-                                }
-                                continue;
-                            }
-                            else
-                            {
-                                //TODO запрос визуализатору чтобы довез до нужного ангара, передаю свой entity и ангар
-                                Bus.State = EntityState.MOVING;
-                                string moveme = "...?entity=" + Entity.BUS + "&zone=" + Bus.Commands[0].Hangar;
-                                Util.MakeRequest(moveme);
-                                continue;
-                            }
+//                            string checkSDK = "...?planeID=" + Bus.Commands[0].PlaneId;
+//                            string checkresult = Util.MakeRequest(checkSDK);
+//                            bool unloadfinished = JsonConvert.DeserializeObject<bool>(checkresult);
+//                            if (unloadfinished) //если разгрузка закончена(самолет пуст)
+//                            {
+//                                //завершаем действие
+//                                lock (Bus.Commands)
+//                                {
+//                                    Bus.Commands.RemoveAt(0);
+//                                }
+//                                continue;
+//                            }
+//                            else
+//                            {
+//                                //TODO запрос визуализатору чтобы довез до нужного ангара, передаю свой entity и ангар
+//                                Bus.State = EntityState.MOVING;
+//                                string moveme = "...?entity=" + Entity.BUS + "&zone=" + Bus.Commands[0].Hangar;
+//                                Util.MakeRequest(moveme);
+//                                continue;
+//                            }
                         }
 
                     }
-                    else if (Bus.Commands[0].isUnload == false)// если мы загружаем самолет
+                    else if (Bus.Commands[0].Item3 == PlaneServiceStage.LOAD_PASSENGERS)// если мы загружаем самолет
                     {
                         if (Bus.PassengersCount == Bus.MAX_COUNT_OF_PASSENGERS) //если автобус заполнен
                         {
                             //TODO запрос визуализатору чтобы довез до нужного ангара, передаю свой entity и ангар
                             Bus.State = EntityState.MOVING;
-                            string moveme = "...?entity=" + Entity.BUS + "&zone=" + Bus.Commands[0].Hangar;
-                            Util.MakeRequest(moveme);
+//                            string moveme = "...?entity=" + Entity.BUS + "&zone=" + Bus.Commands[0].Hangar;
+//                            Util.MakeRequest(moveme);
                             continue;
                         }
                         else if (Bus.PassengersCount < Bus.MAX_COUNT_OF_PASSENGERS)
@@ -149,8 +183,8 @@ namespace Bus
                             {
                                 //TODO запрос визуализатору чтобы довез до нужного ангара, передаю свой entity и ангар
                                 Bus.State = EntityState.MOVING;
-                                string moveme = "...?entity=" + Entity.BUS + "&zone=" + Bus.Commands[0].Hangar;
-                                Util.MakeRequest(moveme);
+//                                string moveme = "...?entity=" + Entity.BUS + "&zone=" + Bus.Commands[0].Hangar;
+//                                Util.MakeRequest(moveme);
                                 continue;
                             }
                             else continue; //если еще не закончились пассажиры на загрузку
@@ -161,7 +195,7 @@ namespace Bus
                 }
                 else if (Bus.CurrentZone == Zone.HANGAR_1 || Bus.CurrentZone == Zone.HANGAR_2)//если автобус в ангаре
                 {
-                    if (Bus.Commands[0].isUnload == true)//если на разгрузке
+                    if (Bus.Commands[0].Item3 == PlaneServiceStage.UNLOAD_PASSENGERS)//если на разгрузке
                     {
                         if (Bus.PassengersCount == Bus.MAX_COUNT_OF_PASSENGERS) //если автобус заполнен
                         {
@@ -196,7 +230,7 @@ namespace Bus
                             else continue; //если еще не закончились пассажиры на загрузку
                         }
                     }
-                    else if (Bus.Commands[0].isUnload == false)// если мы загружаем самолет
+                    else if (Bus.Commands[0].Item3 == PlaneServiceStage.LOAD_PASSENGERS)// если мы загружаем самолет
                     {
                         if (Bus.PassengersCount > 0)//если еще есть пассажиры внутри
                         {
@@ -236,7 +270,6 @@ namespace Bus
                             continue;
 
                         }
-
                     }
                 }
                 //добавлять действия сюда

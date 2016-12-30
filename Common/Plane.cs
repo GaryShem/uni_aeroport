@@ -32,7 +32,7 @@ namespace Common
             CargoCount = cargoCount;
             FuelCount = fuelCount;
             State = EntityState.WAITING_FOR_COMMAND;
-            CurrentZone = Zone.PLANE_SPAWN;
+            CurrentZone = Zone.PLANE_SPAWN_1;
             HasAction = false;
             SpawnTime = DateTime.Now;
             Passengers = new List<string>(passengerIds);

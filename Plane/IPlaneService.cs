@@ -25,13 +25,7 @@ namespace Plane
              BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "GetAllPlanes")]
         string GetAllPlanes();
-
-        [OperationContract]
-        [WebInvoke(Method = "GET",
-             ResponseFormat = WebMessageFormat.Json,
-             BodyStyle = WebMessageBodyStyle.Bare,
-             UriTemplate = "LoadPassengers?id={id}")]
-        void LoadPassengers(string id);
+        
 
         [OperationContract]
         [WebInvoke(Method = "GET",
@@ -44,8 +38,21 @@ namespace Plane
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "TakePassengersFromBus?flightId={id}")]
+        void TakePassengersFromBus(string id);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "UnloadPassengers?flightId={flightId}&count={count}")]
+        string UnloadPassengers(string flightId, int count);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "Start")]
         void Start();
     }
-    
 }

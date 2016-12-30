@@ -15,7 +15,8 @@ namespace Common
         HANGAR_1,
         HANGAR_2,
         FUEL_STATION,
-        PLANE_SPAWN,
+        PLANE_SPAWN_1,
+        PLANE_SPAWN_2,
         BUS,
         PLANE,
         CARGO_DROPOFF

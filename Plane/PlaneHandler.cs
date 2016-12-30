@@ -16,7 +16,7 @@ namespace Plane
         private static Thread PlaneHandlerThread;
         private static bool h1free;
         private static bool h2free;
-        private static int iter = 0;
+//        private static int iter = 0;
 
         private static Common.Plane GeneratePlane()
         {
@@ -103,7 +103,7 @@ namespace Plane
                         // движение не рассматриваем
 
                         //если самолёт находится в воздухе
-                        if (plane.CurrentZone == Zone.PLANE_SPAWN)
+                        if (plane.CurrentZone == Zone.PLANE_SPAWN_1 || plane.CurrentZone == Zone.PLANE_SPAWN_2)
                         {
                             // если самолёт закончил движение, то его можно убрать и сгенерить новый
                             if (plane.State == EntityState.FINISHED_TASK)
@@ -133,18 +133,20 @@ namespace Plane
                                 // если время пришло, то спавним самолёт и отправляем на посадку
                                 if (plane.HasAction && plane.ActionTime < DateTime.Now)
                                 {
-                                    Zone zone = Zone.BUS;
+                                    Zone zone = Zone.FUEL_STATION;
                                     bool isLanding = false;
                                     
                                     if (h1free)
                                     {
                                         zone = Zone.HANGAR_1;
+                                        plane.CurrentZone = Zone.PLANE_SPAWN_1;
                                         isLanding = true;
                                         h1free = false;
                                     }
                                     else if (h2free)
                                     {
                                         zone = Zone.HANGAR_2;
+                                        plane.CurrentZone = Zone.PLANE_SPAWN_2;
                                         isLanding = true;
                                         h2free = false;
 
@@ -153,7 +155,7 @@ namespace Plane
                                     {
                                         string URL =
                                            String.Format("http://localhost:{0}/VisualizerService.svc/SpawnPlane?type={1}&id={2}&zone={3}&cargo={4}&passengerCount={5}&fuelCount={6}",
-                                           Ports.Visualizer, (int)Entity.PLANE, plane.Id, (int)Zone.PLANE_SPAWN, plane.CargoCount, plane.PassengerCount, plane.FuelCount);
+                                           Ports.Visualizer, (int)Entity.PLANE, plane.Id, (int)plane.CurrentZone, plane.CargoCount, plane.PassengerCount, plane.FuelCount);
                                         Util.MakeRequest(URL);
                                         URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?id={1}&zone={2}", Ports.Visualizer, plane.Id, (int)zone);
                                         Util.MakeRequest(URL);
@@ -166,6 +168,9 @@ namespace Plane
                         // если самолёт уже сел
                         else if (plane.CurrentZone == Zone.HANGAR_1 || plane.CurrentZone == Zone.HANGAR_2)
                         {
+                            Zone despawnPoint = plane.CurrentZone == Zone.HANGAR_1
+                                ? Zone.PLANE_SPAWN_1
+                                : Zone.PLANE_SPAWN_2;
                             // если самолёт закончил движение, то надо сказать службе наземного контроля о начале разгрузки/погрузки
                             if (plane.State == EntityState.FINISHED_TASK)
                             {
@@ -175,7 +180,7 @@ namespace Plane
                             // если самолёт ждёт команды, то его уже погрузили, и пора улетать
                             else if (plane.State == EntityState.WAITING_FOR_COMMAND)
                             {
-                                string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?id={1}&zone={2}", Ports.Visualizer, plane.Id, (int)Zone.PLANE_SPAWN);
+                                string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?id={1}&zone={2}", Ports.Visualizer, plane.Id, (int)despawnPoint);
                                 Util.MakeRequest(URL);
                                 plane.State = EntityState.MOVING;
                             }

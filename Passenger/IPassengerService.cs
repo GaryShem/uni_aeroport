@@ -38,6 +38,20 @@ namespace Passenger
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "TakePassengersFromBus")]
+        void TakePassengersFromBus();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GivePassengersToBus?flightId={flightId}")]
+        string GivePassengersToBus(string flightId);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "GetAllPassengers")]
         string GetAllPassengers();
     }

@@ -35,8 +35,7 @@ namespace Common
 
         public static void Log(string filename, string logString)
         {
-            System.IO.StreamWriter file = new System.IO.StreamWriter(filename);
-            
+            System.IO.StreamWriter file = File.AppendText(filename);
             file.WriteLine(logString);
             file.Close();
         }

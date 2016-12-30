@@ -12,14 +12,18 @@ namespace Bus
     [ServiceContract]
     public interface IBusService
     {
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Wrapped,
+             UriTemplate = "UnloadPassengers")]
+        string UnloadPassengers();
 
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Wrapped,
-             UriTemplate = "LoadPassengers?flightId={flightId}")]
-        string LoadPassengers(string flightId);
-
-        // TODO: Add your service operations here
+             UriTemplate = "AddAction?flightId={flightId}&zone={zoneNum}&action={actionNum}")]
+        void AddAction(string flightId, int zoneNum, int actionNum);
     }
 }

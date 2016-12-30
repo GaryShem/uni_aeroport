@@ -14,8 +14,52 @@ namespace GroundControl
     {
 
         [OperationContract]
-        string GetData(int value);
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "StartService?id={id}&zone={zoneNum}")]
+        void StartService(string id, int zoneNum);
 
-        // TODO: Add your service operations here
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "FinishUnloadingPassengers?id={id}&zone={zoneNum}")]
+        void FinishUnloadingPassengers(string id, int zoneNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "FinishUnloadingCargo?id={id}&zone={zoneNum}")]
+        void FinishUnloadingCargo(string id, int zoneNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "FinishRefueling?id={id}&zone={zoneNum}")]
+        void FinishRefueling(string id, int zoneNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "FinishLoadingCargo?id={id}&zone={zoneNum}")]
+        void FinishLoadingCargo(string id, int zoneNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "FinishLoadingPassengers?id={id}&zone={zoneNum}")]
+        void FinishLoadingPassengers(string id, int zoneNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "CheckStage?id={id}&zone={zoneNum}")]
+        string CheckStage(string id, int zoneNum);
     }
 }
