@@ -71,11 +71,11 @@ namespace Passenger
 
         public string GivePassengersToBus(string flightId)
         {
-            List<string> passengerList =
-                PassengerHandler.Passengers.Where(x => x.Id.Equals(flightId) && x.CurrentZone == Zone.WAITING_AREA)
-                    .Take(2)
-                    .Select(x => x.Id)
-                    .ToList();
+            var passengerList= PassengerHandler.Passengers
+                .Where(x => x.FlightId.Equals(flightId) && x.CurrentZone == Zone.WAITING_AREA && x.RegState == RegistrationState.REGISTERED)
+                .Take(Common.Bus.TAKE_PASSENGERS)
+                .Select(x => x.Id)
+                .ToList();
             foreach (string passengerId in passengerList)
             {
                 CompleteMove(passengerId, (int)Zone.BUS);

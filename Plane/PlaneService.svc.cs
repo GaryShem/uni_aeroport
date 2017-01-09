@@ -63,6 +63,14 @@ namespace Plane
                 URL = String.Format("{0}/CompleteMove?id={1}&zone={2}", ServiceStrings.Passenger, passenger, (int)Zone.PLANE);
                 Util.MakeRequest(URL);
             }
+            URL = String.Format("{0}/GetPassengers?flightId={1}", ServiceStrings.RegStand, plane.Id);
+            response = Util.MakeRequest(URL);
+            List<string> passengerList = JsonConvert.DeserializeObject<List<string>>(response);
+            if (plane.Passengers.Count == passengerList.Count)
+            {
+                URL = String.Format("{0}/FinishLoadingPassengers?id={1}&zone={2}", ServiceStrings.GrControl, plane.Id, (int)plane.CurrentZone);
+                Util.MakeRequest(URL);
+            }
         }
 
         public string UnloadPassengers(string flightId, int count)

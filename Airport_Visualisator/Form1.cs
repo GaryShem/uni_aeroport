@@ -92,16 +92,13 @@ namespace Airport_Visualisator
             while (true)
             {
                 string planeString =
-                    Util.MakeRequest(String.Format("http://localhost:{0}/VisualizerService.svc/GetAllPlanes",
-                        Ports.Visualizer));
+                    Util.MakeRequest(String.Format("{0}/GetAllPlanes", ServiceStrings.Vis));
                     planesList = JsonConvert.DeserializeObject<List<Tuple<int, Point>>>(planeString);
                 string vehicleString =
-                    Util.MakeRequest(String.Format("http://localhost:{0}/VisualizerService.svc/GetAllVehicles",
-                        Ports.Visualizer));
+                    Util.MakeRequest(String.Format("{0}/GetAllVehicles", ServiceStrings.Vis));
                     vehicleList = JsonConvert.DeserializeObject<List<Tuple<int, Point>>>(vehicleString);
                 string passengerString =
-                    Util.MakeRequest(String.Format("http://localhost:{0}/VisualizerService.svc/GetAllPassengers",
-                        Ports.Visualizer));
+                    Util.MakeRequest(String.Format("{0}/GetAllPassengers", ServiceStrings.Vis));
 
                 List<Tuple<int, Point>> bufferPlane = JsonConvert.DeserializeObject<List<Tuple<int, Point>>>(planeString);
                 List<Tuple<int, Point>> bufferVehicle = JsonConvert.DeserializeObject<List<Tuple<int, Point>>>(vehicleString);

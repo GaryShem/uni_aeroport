@@ -22,6 +22,48 @@ namespace Passenger
             PassengerHandlerThread.Start();
         }
 
+        private static void DespawnPassenger(Common.Passenger passenger)
+        {
+            string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Despawn?id={1}",
+                                    Ports.Visualizer, passenger.Id);
+            Util.MakeRequest(URL);
+            Passengers.Remove(Passengers.Find(x => x.Id.Equals(passenger.Id)));
+        }
+
+        private static void SpawnPassenger(Common.Passenger passenger)
+        {
+            string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Spawn?type={1}&id={2}&zone={3}&cargo={4}",
+                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.PASSENGER_SPAWN, passenger.CargoCount);
+            Util.MakeRequest(URL);
+        }
+
+        private static void MovePassenger(Common.Passenger passenger, Zone zone)
+        {
+            string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
+                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)zone);
+            Util.MakeRequest(URL);
+            passenger.State = EntityState.MOVING;
+        }
+
+        private static void RegisterPassenger(Common.Passenger passenger)
+        {
+            string URL = String.Format("http://localhost:{0}/RegistrationStandService.svc/Register?flightId={1}&passengerId={2}&cargo={3}",
+                                            Ports.RegStand, passenger.FlightId, passenger.Id, passenger.CargoCount);
+            string result = Common.Util.MakeRequest(URL);
+            bool response = JsonConvert.DeserializeObject<bool>(result);
+
+            passenger.RegState = response ? RegistrationState.REGISTERED : RegistrationState.REJECTED;
+            passenger.State = EntityState.WAITING_FOR_COMMAND;
+        }
+
+        private static PlaneServiceStage CheckPlaneStage(string flightId)
+        {
+            string URL = String.Format("{0}/CheckStage?id={1}", ServiceStrings.GrControl, flightId);
+            string response = Util.MakeRequest(URL);
+            PlaneServiceStage result = (PlaneServiceStage)JsonConvert.DeserializeObject<int>(response);
+            return result;
+        }
+
         public static void HandlePassengers()
         {
             while (true)
@@ -50,25 +92,12 @@ namespace Passenger
                             if (passenger.RegState == RegistrationState.EXITING || passenger.RegState == RegistrationState.REJECTED)
                             {
                                 //TODO: сделать запрос визуализатору DESPAWN
-                                string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Despawn?id={1}",
-                                    Ports.Visualizer, passenger.Id);
-                                Util.MakeRequest(URL);
-                                Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
+                                DespawnPassenger(passenger);
                             }
                             else //если пассажир только по¤вилс¤
                             {
-                                string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Spawn?type={1}&id={2}&zone={3}&cargo={4}",
-                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.PASSENGER_SPAWN, passenger.CargoCount);
-                                Util.MakeRequest(URL);
-                                
-                                URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
-                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.REGISTRATION_STAND);
-                                Util.MakeRequest(URL);
-                                passenger.State = EntityState.MOVING;
-
-                                //"Move?type={entityNum}&id={id}&zone={zoneNum}")]
-                                //                                passenger.CurrentZone = Zone.REGISTRATION_STAND;
-                                //                                passenger.State = EntityState.WAITING_FOR_COMMAND;
+                                SpawnPassenger(passenger);
+                                MovePassenger(passenger, Zone.REGISTRATION_STAND);
                             }
                             //continue;
                         }
@@ -86,14 +115,8 @@ namespace Passenger
                                     //запрос регистрации
                                     //TODO: сделать нормально запрос
                                     //сделано
-                                    string URL =
-                                        String.Format("http://localhost:{0}/RegistrationStandService.svc/Register?flightId={1}&passengerId={2}&cargo={3}",
-                                            Ports.RegStand, passenger.FlightId, passenger.Id, passenger.CargoCount);
-                                    string result = Common.Util.MakeRequest(URL);
-                                    bool response = JsonConvert.DeserializeObject<bool>(result);
-
-                                    passenger.RegState = response ? RegistrationState.REGISTERED : RegistrationState.REJECTED;
-                                    passenger.State = EntityState.WAITING_FOR_COMMAND;
+                                    RegisterPassenger(passenger);
+                                    
                                 }
                                 else //если пассажир прилетающий
                                 {
@@ -103,10 +126,7 @@ namespace Passenger
                                     Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                                     passenger.RegState = RegistrationState.EXITING;
                                     //TODO: сделать запрос визуализатору на перемещение к спауну
-                                    string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
-                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.PASSENGER_SPAWN);
-
-                                    passenger.State = EntityState.MOVING;
+                                    MovePassenger(passenger, Zone.PASSENGER_SPAWN);
 //                                    passenger.CurrentZone = Zone.PASSENGER_SPAWN;
 //                                    passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 }
@@ -117,9 +137,7 @@ namespace Passenger
                             {
                                 passenger.State = EntityState.MOVING;
                                 //TODO: сделать запрос визуализатору на перемещение к спауну
-                                string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
-                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.PASSENGER_SPAWN);
-                                Util.MakeRequest(URL);
+                                MovePassenger(passenger, Zone.PASSENGER_SPAWN);
 //                                passenger.CurrentZone = Zone.PASSENGER_SPAWN;
 //                                passenger.State = EntityState.WAITING_FOR_COMMAND;
                             }
@@ -132,19 +150,14 @@ namespace Passenger
                                 {
                                     passenger.State = EntityState.MOVING;
                                     //TODO: сделать запрос визуализатору на движение в зону багажа
-                                    string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
-                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.CARGO_DROPOFF);
-                                    Util.MakeRequest(URL);
+                                    MovePassenger(passenger, Zone.CARGO_DROPOFF);
 //                                    passenger.CurrentZone = Zone.CARGO_DROPOFF;
 //                                    passenger.State = EntityState.WAITING_FOR_COMMAND;
                                 }
                                 else //если пассажир прилетающий
                                 {
                                     Common.Util.Log(log, "Passenger " + passenger.Id + " removed");
-                                    string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Despawn?id={1}",
-                                    Ports.Visualizer, passenger.Id);
-                                    Util.MakeRequest(URL);
-                                    Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
+                                    DespawnPassenger(passenger);
                                 }
                             }
                             //continue;
@@ -157,10 +170,7 @@ namespace Passenger
                             if (passenger.IsFlyingAway)
                             {
                                 passenger.HoldingCargo = false;
-                                string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
-                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.WAITING_AREA);
-                                Util.MakeRequest(URL);
-                                passenger.State = EntityState.MOVING;
+                                MovePassenger(passenger, Zone.WAITING_AREA);
                                 //TODO: сделать запрос визуализатору на движение в зону ожидания
 //                                passenger.CurrentZone = Zone.WAITING_AREA;
 //                                passenger.State = EntityState.WAITING_FOR_COMMAND;
@@ -170,11 +180,8 @@ namespace Passenger
                                 passenger.HoldingCargo = false;
                                 
                                 //TODO: сделать запрос визуализатору на перемещение к спауну
-                                string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
-                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.PASSENGER_SPAWN);
-                                Util.MakeRequest(URL);
+                                MovePassenger(passenger, Zone.PASSENGER_SPAWN);
                                 passenger.RegState = RegistrationState.EXITING;
-                                passenger.State = EntityState.MOVING;
 //                                passenger.CurrentZone = Zone.PASSENGER_SPAWN;
 //                                passenger.State = EntityState.WAITING_FOR_COMMAND;
                             }
@@ -205,29 +212,15 @@ namespace Passenger
                                 //если пассажир улетающий
                                 if (passenger.IsFlyingAway)
                                 {
-//                                    passenger.State = EntityState.MOVING;
-                                    //TODO: запрос визуализатору на движение куда-то в аэропорту
-//                                    passenger.State = EntityState.WAITING_FOR_COMMAND;
-
-                                    //////////////////////////////////////////////////////////////////////////
-                                    /// тут будет с появлением автобуса
-
-                                    passenger.IsFlyingAway = false;
-//                                    passenger.RegState = RegistrationState.EXITING;
-
-
-                                    //////////////////////////////////////////////////////////////////////////
                                     continue;
                                 }
                                 else //прилетающий
                                 {
                                     //TODO: сделать запрос визуализатору на движение к выдаче багажа
-                                    string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?type={1}&id={2}&zone={3}",
-                                    Ports.Visualizer, (int)Entity.PASSENGER, passenger.Id, (int)Zone.CARGO_DROPOFF);
-                                    Util.MakeRequest(URL);
-                                    passenger.State = EntityState.MOVING;
-//                                    passenger.CurrentZone = Zone.CARGO_DROPOFF;
-//                                    passenger.State = EntityState.WAITING_FOR_COMMAND;
+                                    if (CheckPlaneStage(passenger.FlightId) != PlaneServiceStage.UNLOAD_PASSENGERS)
+                                    {
+                                        MovePassenger(passenger, Zone.CARGO_DROPOFF);
+                                    }
                                 }
                             }
                             else

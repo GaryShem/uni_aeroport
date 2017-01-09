@@ -59,7 +59,7 @@ namespace GroundControl
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Bare,
-             UriTemplate = "CheckStage?id={id}&zone={zoneNum}")]
-        string CheckStage(string id, int zoneNum);
+             UriTemplate = "CheckStage?id={id}")]
+        string CheckStage(string id);
     }
 }

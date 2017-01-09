@@ -23,7 +23,6 @@ namespace Common
         public DateTime ActionTime { get; set; }
         public DateTime SpawnTime { get; set; }
         public List<string> Passengers { get; set; }
-        //TODO: добавить список пассажиров
         public Plane(){}
 
         public Plane(string id, List<string> passengerIds, int cargoCount, int fuelCount)

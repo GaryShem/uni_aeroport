@@ -15,15 +15,22 @@ namespace Bus
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
-             BodyStyle = WebMessageBodyStyle.Wrapped,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "UnloadPassengers")]
         string UnloadPassengers();
 
         [OperationContract]
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
-             BodyStyle = WebMessageBodyStyle.Wrapped,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "AddAction?flightId={flightId}&zone={zoneNum}&action={actionNum}")]
         void AddAction(string flightId, int zoneNum, int actionNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "CompleteMove?id={id}&zone={zoneNum}")]
+        void CompleteMove(string id, int zoneNum);
     }
 }

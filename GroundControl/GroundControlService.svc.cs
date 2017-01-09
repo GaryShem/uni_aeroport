@@ -16,22 +16,30 @@ namespace GroundControl
     {
         private static Triple<string, PlaneServiceStage, Zone, int> h1stage = new Triple<string, PlaneServiceStage, Zone, int>("", PlaneServiceStage.NOT_IN_SERVICE, Zone.HANGAR_1, 0);
         private static Triple<string, PlaneServiceStage, Zone, int> h2stage = new Triple<string, PlaneServiceStage, Zone, int>("", PlaneServiceStage.NOT_IN_SERVICE, Zone.HANGAR_2, 0);
-        public void StartService(string id, int zoneNum)
+
+        private Triple<string, PlaneServiceStage, Zone, int> GetHangarInfo(string id, Zone zone)
         {
-            Zone zone = (Zone)zoneNum;
             switch (zone)
             {
                 case Zone.HANGAR_1:
-                    h1stage.Item2 = PlaneServiceStage.UNLOAD_PASSENGERS;
-                    h1stage.Item1 = id;
-                    break;
+                    if (String.IsNullOrWhiteSpace(h1stage.Item1) == false && h1stage.Item1.Equals(id) == false)
+                        throw new ArgumentOutOfRangeException(nameof(zone), zone, "There is a different plane in that zone");
+                    return h1stage;
                 case Zone.HANGAR_2:
-                    h2stage.Item2 = PlaneServiceStage.UNLOAD_PASSENGERS;
-                    h2stage.Item1 = id;
-                    break;
+                    if (String.IsNullOrWhiteSpace(h2stage.Item1) == false && h2stage.Item1.Equals(id) == false)
+                        throw new ArgumentOutOfRangeException(nameof(zone), zone, "There is a different plane in that zone");
+                    return h2stage;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
+                    throw new ArgumentOutOfRangeException(nameof(zone), zone, "This zone is not a hangar");
             }
+        }
+
+        public void StartService(string id, int zoneNum)
+        {
+            Zone zone = (Zone)zoneNum;
+            Triple<string, PlaneServiceStage, Zone, int> currentTriple = GetHangarInfo(id, zone);
+            currentTriple.Item1 = id;
+            currentTriple.Item2 = PlaneServiceStage.UNLOAD_PASSENGERS;
             string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}&action={3}",
                 ServiceStrings.Bus, id, zoneNum, (int)PlaneServiceStage.UNLOAD_PASSENGERS);
             Util.MakeRequest(URL);
@@ -40,145 +48,77 @@ namespace GroundControl
         public void FinishUnloadingPassengers(string id, int zoneNum)
         {
             Zone zone = (Zone) zoneNum;
-            switch (zone)
+            Triple<string, PlaneServiceStage, Zone, int> currentTriple = GetHangarInfo(id, zone);
+            if (currentTriple.Item2 == PlaneServiceStage.UNLOAD_PASSENGERS)
             {
-                case Zone.HANGAR_1:
-                    if (h1stage.Item1.Equals(id) == false)
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    //                    h1stage.Item2 = PlaneServiceStage.UNLOAD_CARGO;
-                    h1stage.Item2 = PlaneServiceStage.LOAD_PASSENGERS;
-                    break;
-                case Zone.HANGAR_2:
-                    if (h2stage.Item1.Equals(id) == false)
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    //                    h2stage.Item2 = PlaneServiceStage.UNLOAD_CARGO;
-                    h2stage.Item2 = PlaneServiceStage.LOAD_PASSENGERS;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
+                string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}&action={3}",
+                    ServiceStrings.Bus, id, zoneNum, (int)PlaneServiceStage.LOAD_PASSENGERS);
+                Util.MakeRequest(URL);
+                currentTriple.Item2 = PlaneServiceStage.LOAD_PASSENGERS;
             }
-            string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}&action={3}",
-                ServiceStrings.Bus, id, zoneNum, (int)PlaneServiceStage.LOAD_PASSENGERS);
-            Util.MakeRequest(URL);
         }
 
         public void FinishUnloadingCargo(string id, int zoneNum)
         {
             Zone zone = (Zone)zoneNum;
-            switch (zone)
+            Triple<string, PlaneServiceStage, Zone, int> currentTriple = GetHangarInfo(id, zone);
+            if (currentTriple.Item2 == PlaneServiceStage.UNLOAD_CARGO)
             {
-                case Zone.HANGAR_1:
-                    if (h1stage.Item1.Equals(id) == false)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    }
-                    h1stage.Item2 = PlaneServiceStage.REFUEL;
-                    break;
-                case Zone.HANGAR_2:
-                    if (h2stage.Item1.Equals(id) == false)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    }
-                    h2stage.Item2 = PlaneServiceStage.REFUEL;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
+                string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}&action={3}",
+                    ServiceStrings.Bus, id, zoneNum, (int)PlaneServiceStage.LOAD_PASSENGERS);
+                Util.MakeRequest(URL);
+                currentTriple.Item2 = PlaneServiceStage.REFUEL;
             }
         }
 
         public void FinishRefueling(string id, int zoneNum)
         {
             Zone zone = (Zone)zoneNum;
-            switch (zone)
+            Triple<string, PlaneServiceStage, Zone, int> currentTriple = GetHangarInfo(id, zone);
+            if (currentTriple.Item2 == PlaneServiceStage.REFUEL)
             {
-                case Zone.HANGAR_1:
-                    if (h1stage.Item1.Equals(id) == false)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    }
-                    h1stage.Item2 = PlaneServiceStage.LOAD_CARGO;
-                    break;
-                case Zone.HANGAR_2:
-                    if (h2stage.Item1.Equals(id) == false)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    }
-                    h2stage.Item2 = PlaneServiceStage.LOAD_CARGO;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
+                currentTriple.Item2 = PlaneServiceStage.LOAD_CARGO;
             }
+
         }
 
         public void FinishLoadingCargo(string id, int zoneNum)
         {
             Zone zone = (Zone)zoneNum;
-            switch (zone)
+            Triple<string, PlaneServiceStage, Zone, int> currentTriple = GetHangarInfo(id, zone);
+            if (currentTriple.Item2 == PlaneServiceStage.UNLOAD_CARGO)
             {
-                case Zone.HANGAR_1:
-                    if (h1stage.Item1.Equals(id) == false)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    }
-                    h1stage.Item2 = PlaneServiceStage.LOAD_PASSENGERS;
-                    break;
-                case Zone.HANGAR_2:
-                    if (h2stage.Item1.Equals(id) == false)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    }
-                    h2stage.Item2 = PlaneServiceStage.LOAD_PASSENGERS;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
+                currentTriple.Item2 = PlaneServiceStage.LOAD_PASSENGERS;
+                string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}&action={3}",
+                    ServiceStrings.Bus, id, zoneNum, (int)PlaneServiceStage.LOAD_PASSENGERS);
+                Util.MakeRequest(URL);
             }
         }
 
         public void FinishLoadingPassengers(string id, int zoneNum)
         {
             Zone zone = (Zone)zoneNum;
-            switch (zone)
+            Triple<string, PlaneServiceStage, Zone, int> currentTriple = GetHangarInfo(id, zone);
+            if (currentTriple.Item2 == PlaneServiceStage.LOAD_PASSENGERS)
             {
-                case Zone.HANGAR_1:
-                    if (h1stage.Item1.Equals(id) == false)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    }
-                    h1stage.Item2 = PlaneServiceStage.TAKEOFF;
-                    break;
-                case Zone.HANGAR_2:
-                    if (h2stage.Item1.Equals(id) == false)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
-                    }
-                    h2stage.Item2 = PlaneServiceStage.TAKEOFF;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(zoneNum), zoneNum, null);
+                currentTriple.Item2 = PlaneServiceStage.TAKEOFF;
+                string URL = String.Format("{0}/GoAway?id={1}", ServiceStrings.Plane, id);
+                Util.MakeRequest(URL);
+                currentTriple.Item1 = "";
             }
-            string URL = String.Format("{0}/GoAway?id={1}", ServiceStrings.Plane, id);
-            Util.MakeRequest(URL);
         }
 
-        public string CheckStage(string id, int zoneNum)
+        public string CheckStage(string id)
         {
-            Zone zone = (Zone) zoneNum;
-            if (zone == Zone.HANGAR_1)
+            if (h1stage.Item1.Equals(id))
             {
-                if (h1stage.Item1.Equals(id))
-                {
-                    return JsonConvert.SerializeObject((int)h1stage.Item2);
-                }
+                return JsonConvert.SerializeObject((int) h1stage.Item2);
             }
-            else if (zone == Zone.HANGAR_2)
+            else if (h2stage.Item1.Equals(id))
             {
-                if (h2stage.Item1.Equals(id))
-                {
-                    return JsonConvert.SerializeObject((int)h2stage.Item2);
-                }
+                return JsonConvert.SerializeObject((int) h2stage.Item2);
             }
-            else throw new ArgumentOutOfRangeException(nameof(zoneNum));
-            return JsonConvert.SerializeObject((int)PlaneServiceStage.NOT_IN_SERVICE);
+            return JsonConvert.SerializeObject((int) PlaneServiceStage.NOT_IN_SERVICE);
         }
     }
 }

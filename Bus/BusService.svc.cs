@@ -15,16 +15,15 @@ namespace Bus
     // NOTE: In order to launch WCF Test Client for testing this service, please select BusService.svc or BusService.svc.cs at the Solution Explorer and start debugging.
     public class BusService : IBusService
     {
-        private static int passengerTransferCount = 2;
         public string UnloadPassengers()
         {
             List<string> result = new List<string>();
-            for (int i = 0; i < passengerTransferCount; i++)
+            for (int i = 0; i < Common.Bus.TAKE_PASSENGERS; i++)
             {
-                if (Bus.Passengers.Count > 0)
+                if (BusHandler._bus.Passengers.Count > 0)
                 {
-                    result.Add(Bus.Passengers[0]);
-                    Bus.Passengers.RemoveAt(0);
+                    result.Add(BusHandler._bus.Passengers[0]);
+                    BusHandler._bus.Passengers.RemoveAt(0);
                 }
             }
             return JsonConvert.SerializeObject(result);
@@ -34,10 +33,17 @@ namespace Bus
         {
             if ((Zone)zoneNum != Zone.HANGAR_1 && (Zone)zoneNum != Zone.HANGAR_2)
                 throw new ArgumentOutOfRangeException(nameof(zoneNum));
-            lock (Bus.Commands)
+            lock (BusHandler._bus.Commands)
             {
-                Bus.Commands.Add(new Tuple<string, Zone, PlaneServiceStage>(flightId, (Zone)zoneNum, (PlaneServiceStage)actionNum));
+                BusHandler._bus.Commands.Add(new Tuple<string, Zone, PlaneServiceStage>(flightId, (Zone)zoneNum, (PlaneServiceStage)actionNum));
             }
+        }
+
+        public void CompleteMove(string id, int zoneNum)
+        {
+            Zone zone = (Zone) zoneNum;
+            BusHandler._bus.CurrentZone = zone;
+            BusHandler._bus.State = EntityState.WAITING_FOR_COMMAND;
         }
     }
 }

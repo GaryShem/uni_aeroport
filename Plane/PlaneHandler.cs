@@ -78,6 +78,42 @@ namespace Plane
             }
         }
 
+        private static void StartPlaneMaintenance(Common.Plane plane)
+        {
+            string URL = String.Format("{0}/StartService?id={1}&zone={2}",
+                ServiceStrings.GrControl, plane.Id, (int)plane.CurrentZone);
+            Util.MakeRequest(URL);
+            plane.State = EntityState.STANDING_BY;
+        }
+
+        private static void MovePlane(Common.Plane plane, Zone zone)
+        {
+            string URL = String.Format("{0}/Move?type={1}&id={2}&zone={3}",
+                                    ServiceStrings.Vis, (int)Entity.PLANE, plane.Id, (int)zone);
+            Util.MakeRequest(URL);
+            plane.State = EntityState.MOVING;
+        }
+
+        private static void SpawnPlane(Common.Plane plane)
+        {
+            string URL = String.Format("{0}/SpawnPlane?type={1}&id={2}&zone={3}&cargo={4}&passengerCount={5}&fuelCount={6}",
+                         ServiceStrings.Vis, (int)Entity.PLANE, plane.Id, (int)plane.CurrentZone, plane.CargoCount, plane.PassengerCount, plane.FuelCount);
+            Util.MakeRequest(URL);
+        }
+
+        private static void RemovePlane(Common.Plane plane)
+        {
+            string URL = String.Format("{0}/Despawn?id={1}",
+                ServiceStrings.Vis, plane.Id);
+            Util.MakeRequest(URL);
+            Planes.Remove(plane);
+            if (Planes.Count < 4)
+            {
+                plane = GeneratePlane();
+                Planes.Add(plane);
+            }
+        }
+
         public static void HandlePlanes()
         {
             // все изменения списка самолётов проводятся ТОЛЬКО в основном цикле
@@ -108,11 +144,7 @@ namespace Plane
                             // если самолёт закончил движение, то его можно убрать и сгенерить новый
                             if (plane.State == EntityState.FINISHED_TASK)
                             {
-                                string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Despawn?id={1}", Ports.Visualizer, plane.Id);
-                                Util.MakeRequest(URL);
-                                Planes.Remove(plane);
-                                plane = GeneratePlane();
-                                Planes.Add(plane);
+                                RemovePlane(plane);
                                 activePlanes--;
                             }
                             // если самолёт ждёт разрешения на посадку, то проверяем свободные полосы
@@ -153,13 +185,9 @@ namespace Plane
                                     }
                                     if (isLanding)
                                     {
-                                        string URL =
-                                           String.Format("http://localhost:{0}/VisualizerService.svc/SpawnPlane?type={1}&id={2}&zone={3}&cargo={4}&passengerCount={5}&fuelCount={6}",
-                                           Ports.Visualizer, (int)Entity.PLANE, plane.Id, (int)plane.CurrentZone, plane.CargoCount, plane.PassengerCount, plane.FuelCount);
-                                        Util.MakeRequest(URL);
-                                        URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?id={1}&zone={2}", Ports.Visualizer, plane.Id, (int)zone);
-                                        Util.MakeRequest(URL);
-                                        plane.State = EntityState.MOVING;
+                                        
+                                        SpawnPlane(plane);
+                                        MovePlane(plane, zone);
                                     }
                                 }
                             }
@@ -175,14 +203,12 @@ namespace Plane
                             if (plane.State == EntityState.FINISHED_TASK)
                             {
                                 //TODO: начать погрузку/разгрузку самолёта
-                                plane.State = EntityState.WAITING_FOR_COMMAND;
+                                StartPlaneMaintenance(plane);
                             }
                             // если самолёт ждёт команды, то его уже погрузили, и пора улетать
                             else if (plane.State == EntityState.WAITING_FOR_COMMAND)
                             {
-                                string URL = String.Format("http://localhost:{0}/VisualizerService.svc/Move?id={1}&zone={2}", Ports.Visualizer, plane.Id, (int)despawnPoint);
-                                Util.MakeRequest(URL);
-                                plane.State = EntityState.MOVING;
+                                MovePlane(plane, despawnPoint);
                             }
                             // если самолёт ждёт, то его ещё не загрузили 
                             else if (plane.State == EntityState.STANDING_BY)
@@ -194,7 +220,6 @@ namespace Plane
                         // остальные действия, такие как принятие пассажиров или отлёт, а также регистрация в службе наземного контроля, выполняются в веб-методах
                     }
                 }
-                Thread.Sleep(1000);
             }
         }
     }
