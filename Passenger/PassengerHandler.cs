@@ -226,7 +226,6 @@ namespace Passenger
                             else
                             {
                                 //так не должно быть
-                                Common.Util.Log(log, "Passenger " + passenger.Id + " in waiting_area, but not registered!");
                                 Passengers.Remove(Passengers.Find(x => x.Id == passenger.Id));
                             }
                             //continue;
