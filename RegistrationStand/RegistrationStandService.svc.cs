@@ -35,6 +35,12 @@ namespace RegistrationStand
             return JsonConvert.SerializeObject(passengers);
         }
 
+        public string GetCargo(string flightId)
+        {
+            int cargo = RegistrationStand.GetCargo(flightId);
+            return JsonConvert.SerializeObject(cargo);
+        }
+
         public void DeleteList(string flightId)
         {
             RegistrationStand.DeleteList(flightId);

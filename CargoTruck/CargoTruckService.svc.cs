@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using Common;
 
 namespace CargoTruck
 {
@@ -12,9 +13,21 @@ namespace CargoTruck
     // NOTE: In order to launch WCF Test Client for testing this service, please select CargoTruckService.svc or CargoTruckService.svc.cs at the Solution Explorer and start debugging.
     public class CargoTruckService : ICargoTruckService
     {
-        public string GetData(int value)
+        public void CompleteMove(string id, int zoneNum)
         {
-            return string.Format("You entered: {0}", value);
+            Zone zone = (Zone)zoneNum;
+            CargoTruckHandler._CargoTruck.CurrentZone = zone;
+            CargoTruckHandler._CargoTruck.State = EntityState.WAITING_FOR_COMMAND;
+        }
+
+        public void AddAction(string flightId, int zoneNum, int planeServiceStageNum)
+        {
+            Zone zone = (Zone)zoneNum;
+            PlaneServiceStage stage = (PlaneServiceStage) planeServiceStageNum;
+            lock (CargoTruckHandler._CargoTruck.Commands)
+            {
+                CargoTruckHandler._CargoTruck.Commands.Add(new Tuple<string, Zone, PlaneServiceStage>(flightId, zone, stage));
+            }
         }
     }
 }

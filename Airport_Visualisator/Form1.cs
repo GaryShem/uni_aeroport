@@ -71,8 +71,9 @@ namespace Airport_Visualisator
                     g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
                     break;
                 case Entity.CARGO_TRUCK:
-                    img = bus;
-                    g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
+//                    img = bus;
+//                    g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
+                    g.DrawEllipse(Pens.Black, point.X - 4, point.Y - 4, 9, 9);
                     break;
                 case Entity.BUS:
                     img = bus;

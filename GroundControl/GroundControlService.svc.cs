@@ -51,10 +51,10 @@ namespace GroundControl
             Triple<string, PlaneServiceStage, Zone, int> currentTriple = GetHangarInfo(id, zone);
             if (currentTriple.Item2 == PlaneServiceStage.UNLOAD_PASSENGERS)
             {
+                currentTriple.Item2 = PlaneServiceStage.UNLOAD_CARGO;
                 string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}&action={3}",
-                    ServiceStrings.Bus, id, zoneNum, (int)PlaneServiceStage.LOAD_PASSENGERS);
+                    ServiceStrings.Cargo, id, zoneNum, (int)PlaneServiceStage.UNLOAD_CARGO);
                 Util.MakeRequest(URL);
-                currentTriple.Item2 = PlaneServiceStage.LOAD_PASSENGERS;
             }
         }
 
@@ -64,10 +64,10 @@ namespace GroundControl
             Triple<string, PlaneServiceStage, Zone, int> currentTriple = GetHangarInfo(id, zone);
             if (currentTriple.Item2 == PlaneServiceStage.UNLOAD_CARGO)
             {
-                string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}&action={3}",
-                    ServiceStrings.Bus, id, zoneNum, (int)PlaneServiceStage.LOAD_PASSENGERS);
-                Util.MakeRequest(URL);
                 currentTriple.Item2 = PlaneServiceStage.REFUEL;
+                string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}",
+                    ServiceStrings.Fuel, id, zoneNum);
+                Util.MakeRequest(URL);
             }
         }
 
@@ -78,15 +78,17 @@ namespace GroundControl
             if (currentTriple.Item2 == PlaneServiceStage.REFUEL)
             {
                 currentTriple.Item2 = PlaneServiceStage.LOAD_CARGO;
+                string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}&action={3}",
+                    ServiceStrings.Cargo, id, zoneNum, (int) PlaneServiceStage.LOAD_CARGO);
+                Util.MakeRequest(URL);
             }
-
         }
 
         public void FinishLoadingCargo(string id, int zoneNum)
         {
             Zone zone = (Zone)zoneNum;
             Triple<string, PlaneServiceStage, Zone, int> currentTriple = GetHangarInfo(id, zone);
-            if (currentTriple.Item2 == PlaneServiceStage.UNLOAD_CARGO)
+            if (currentTriple.Item2 == PlaneServiceStage.LOAD_CARGO)
             {
                 currentTriple.Item2 = PlaneServiceStage.LOAD_PASSENGERS;
                 string URL = String.Format("{0}/AddAction?flightId={1}&zone={2}&action={3}",
@@ -103,8 +105,8 @@ namespace GroundControl
             {
                 currentTriple.Item2 = PlaneServiceStage.TAKEOFF;
                 string URL = String.Format("{0}/GoAway?id={1}", ServiceStrings.Plane, id);
-                Util.MakeRequest(URL);
                 currentTriple.Item1 = "";
+                Util.MakeRequest(URL);
             }
         }
 

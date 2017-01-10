@@ -62,5 +62,14 @@ namespace RegistrationStand
                 return list != null ? list.Passengers : new List<string>();
             }
         }
+
+        public static int GetCargo(string flightId)
+        {
+            lock (RegistrationLists)
+            {
+                RegistrationList list = RegistrationLists.Find(x => x.FlightId.Equals(flightId));
+                return list != null ? list.CargoCount : -1;
+            }
+        }
     }
 }

@@ -48,8 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bus.cs" />
+    <Compile Include="CargoTruck.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="EntityState.cs" />
+    <Compile Include="FuelTruck.cs" />
     <Compile Include="Passenger.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="PlaneServiceStage.cs" />

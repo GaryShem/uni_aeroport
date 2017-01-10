@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using Common;
 
 namespace FuelTruck
 {
@@ -12,9 +13,20 @@ namespace FuelTruck
     // NOTE: In order to launch WCF Test Client for testing this service, please select FuelTruckService.svc or FuelTruckService.svc.cs at the Solution Explorer and start debugging.
     public class FuelTruckService : IFuelTruckService
     {
-        public string GetData(int value)
+        public void CompleteMove(string id, int zoneNum)
         {
-            return string.Format("You entered: {0}", value);
+            Zone zone = (Zone) zoneNum;
+            FuelTruckHandler._FuelTruck.CurrentZone = zone;
+            FuelTruckHandler._FuelTruck.State = EntityState.WAITING_FOR_COMMAND;
+        }
+
+        public void AddAction(string flightId, int zoneNum)
+        {
+            Zone zone = (Zone) zoneNum;
+            lock (FuelTruckHandler._FuelTruck.Commands)
+            {
+                FuelTruckHandler._FuelTruck.Commands.Add(new Tuple<string, Zone>(flightId, zone));
+            }
         }
     }
 }

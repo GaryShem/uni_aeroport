@@ -45,6 +45,13 @@ namespace RegistrationStand
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GetCargo?flightId={flightId}")]
+        string GetCargo(string flightId);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "DeleteList?flightId={flightId}")]
         void DeleteList(string flightId);
     }

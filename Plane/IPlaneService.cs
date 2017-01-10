@@ -52,7 +52,35 @@ namespace Plane
         [WebInvoke(Method = "GET",
              ResponseFormat = WebMessageFormat.Json,
              BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "AcceptFuel?flightId={flightId}&count={count}")]
+        string AcceptFuel(string flightId, int count);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "Start")]
         void Start();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "TakeCargoFromTruck?flightId={id}&cargo={cargoCount}")]
+        void TakeCargoFromTruck(string id, int cargoCount);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GiveCargoToTruck?flightId={id}&cargo={cargoCount}")]
+        string GiveCargoToTruck(string id, int cargoCount);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GetRemainingCargoToLoad?flightId={flightId}")]
+        string GetRemainingCargoToLoad(string flightId);
     }
 }

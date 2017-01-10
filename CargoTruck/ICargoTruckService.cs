@@ -12,10 +12,18 @@ namespace CargoTruck
     [ServiceContract]
     public interface ICargoTruckService
     {
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "CompleteMove?id={id}&zone={zoneNum}")]
+        void CompleteMove(string id, int zoneNum);
 
         [OperationContract]
-        string GetData(int value);
-
-        // TODO: Add your service operations here
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "AddAction?flightId={flightId}&zone={zoneNum}&action={planeServiceStageNum}")]
+        void AddAction(string flightId, int zoneNum, int planeServiceStageNum);
     }
 }
