@@ -32,5 +32,12 @@ namespace Bus
              BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "CompleteMove?id={id}&zone={zoneNum}")]
         void CompleteMove(string id, int zoneNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "Start")]
+        void Start();
     }
 }

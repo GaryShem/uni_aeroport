@@ -82,5 +82,12 @@ namespace Plane
              BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "GetRemainingCargoToLoad?flightId={flightId}")]
         string GetRemainingCargoToLoad(string flightId);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GeneratePlane?passengerCount={passengerCount}")]
+        void GeneratePlane(int passengerCount);
     }
 }

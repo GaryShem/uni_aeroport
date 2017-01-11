@@ -18,10 +18,8 @@ namespace Plane
         private static bool h2free;
 //        private static int iter = 0;
 
-        private static Common.Plane GeneratePlane()
+        public static Common.Plane GeneratePlane(int passengerCount)
         {
-            int passengerCount = RandomGen.Next(1, Common.Plane.PassengerCapacity + 1);
-
             string planeId = Guid.NewGuid().ToString();
             //OpenRegistration?flightId={flightId}
             string URL = String.Format("{0}/OpenRegistration?flightId={1}", ServiceStrings.RegStand, planeId);
@@ -40,7 +38,8 @@ namespace Plane
             Planes = new List<Common.Plane>(4);
             for (int i = 0; i < 4; i++)
             {
-                Planes.Add(GeneratePlane());
+                int passengerCount = RandomGen.Next(1, Common.Plane.PassengerCapacity + 1);
+                Planes.Add(GeneratePlane(passengerCount));
             }
             h1free = true;
             h2free = true;
@@ -109,7 +108,8 @@ namespace Plane
             Planes.Remove(plane);
             if (Planes.Count < 4)
             {
-                plane = GeneratePlane();
+                int passengerCount = RandomGen.Next(1, Common.Plane.PassengerCapacity + 1);
+                plane = GeneratePlane(passengerCount);
                 Planes.Add(plane);
             }
         }

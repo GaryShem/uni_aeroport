@@ -25,5 +25,19 @@ namespace CargoTruck
              BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "AddAction?flightId={flightId}&zone={zoneNum}&action={planeServiceStageNum}")]
         void AddAction(string flightId, int zoneNum, int planeServiceStageNum);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "GetCargo")]
+        string GetCargo();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "Start")]
+        void Start();
     }
 }

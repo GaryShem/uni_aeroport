@@ -23,6 +23,7 @@ namespace Bus
         {
             string URL = String.Format("{0}/TakePassengersFromBus?flightId={1}&count={2}", ServiceStrings.Plane, flightId, Common.Bus.TAKE_PASSENGERS);
             Util.MakeRequest(URL);
+            UpdatePassengers();
         }
 
         private static void TakePassengersFromPlane(string flightId)
@@ -36,12 +37,14 @@ namespace Bus
                 URL = String.Format("{0}/CompleteMove?id={1}&zone={2}", ServiceStrings.Passenger, passenger, (int)Zone.BUS);
                 Util.MakeRequest(URL);
             }
+            UpdatePassengers();
         }
 
         private static void GivePassengersToStation()
         {
             string URL = String.Format("{0}/TakePassengersFromBus", ServiceStrings.Passenger);
             Util.MakeRequest(URL);
+            UpdatePassengers();
         }
 
         private static void TakePassengersFromStation(string flightId)
@@ -52,6 +55,7 @@ namespace Bus
             List<string> passengerIdList = JsonConvert.DeserializeObject<List<string>>(response);
             //деспавнит служба пассажиров, поэтому здесь просто добавляем в автобус
             _bus.Passengers.AddRange(passengerIdList);
+            UpdatePassengers();
         }
 
         private static PlaneServiceStage CheckPlaneStage(string flightId)
@@ -86,6 +90,12 @@ namespace Bus
             }
         }
 
+        private static void UpdatePassengers()
+        {
+            string URL = String.Format("{0}/UpdateCargo?id={1}&cargoCount={2}",
+                ServiceStrings.Vis, _bus.Id, _bus.Passengers.Count);
+            Util.MakeRequest(URL);
+        }
         private static void HandleBus()
         {
             SpawnBus();

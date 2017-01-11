@@ -25,9 +25,9 @@ namespace Airport_Visualisator
         private BufferedGraphicsContext context;
         private BufferedGraphics graph;
         private Graphics graphNonVisible;
-        private List<Tuple<int, Point>> planesList;
-        private List<Tuple<int, Point>> vehicleList;
-        private List<Tuple<int, Point>> passengerList;
+        private List<Tuple<int, Point, int, int, int>> planesList;
+        private List<Tuple<int, Point, int>> vehicleList;
+        private List<Tuple<int, Point, int>> passengerList;
         Image bus = Image.FromFile("bus.png");
         Image airplane = Image.FromFile("airplane.png");
         Image fuelcar2 = Image.FromFile("fuelcar2.png");
@@ -54,30 +54,40 @@ namespace Airport_Visualisator
 
         }
 
-        private void DrawEntity(Graphics g, Entity entity, Point point)
+        private void DrawPlane(Graphics g, Point point, int passengerCount, int cargoCount, int fuelCount)
+        {
+            Image img = airplane;
+            g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
+            g.DrawString(String.Format("Pass {0}\nCargo {1}\nFuel {2}", passengerCount, cargoCount, fuelCount),
+                new Font("Arial", 10), new SolidBrush(Color.Black), point.X + img.Width / 2, point.Y - img.Height / 2);
+        }
+
+        private void DrawEntity(Graphics g, Entity entity, Point point, int cargoCount)
         {
             Image img;
             switch (entity)
             {
-                case Entity.PLANE:
-                    img = airplane;
-                    g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
-                    break;
                 case Entity.PASSENGER:
                     g.DrawEllipse(Pens.Black, point.X-1, point.Y-1, 3, 3);
                     break;
                 case Entity.FUEL_TRUCK:
                     img = fuelcar2;
                     g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
+                    g.DrawString(String.Format("Fuel {0}", cargoCount),
+                        new Font("Arial", 10), new SolidBrush(Color.Black), point.X - img.Width / 2, point.Y);
                     break;
                 case Entity.CARGO_TRUCK:
 //                    img = bus;
 //                    g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
                     g.DrawEllipse(Pens.Black, point.X - 4, point.Y - 4, 9, 9);
+                    g.DrawString(String.Format("Cargo {0}", cargoCount),
+                        new Font("Arial", 10), new SolidBrush(Color.Black), point.X - 4, point.Y + 4);
                     break;
                 case Entity.BUS:
                     img = bus;
                     g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
+                    g.DrawString(String.Format("Pass {0}", cargoCount),
+                        new Font("Arial", 10), new SolidBrush(Color.Black), point.X - img.Width / 2, point.Y + img.Height / 2);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(entity), entity, null);
@@ -86,24 +96,24 @@ namespace Airport_Visualisator
 
         public void Network()
         {
-            planesList = new List<Tuple<int, Point>>();
-            vehicleList = new List<Tuple<int, Point>>();
-            passengerList = new List<Tuple<int, Point>>();
+            planesList = new List<Tuple<int, Point, int, int, int>>();
+            vehicleList = new List<Tuple<int, Point, int>>();
+            passengerList = new List<Tuple<int, Point, int>>();
 
             while (true)
             {
                 string planeString =
                     Util.MakeRequest(String.Format("{0}/GetAllPlanes", ServiceStrings.Vis));
-                    planesList = JsonConvert.DeserializeObject<List<Tuple<int, Point>>>(planeString);
+                    planesList = JsonConvert.DeserializeObject<List<Tuple<int, Point, int, int, int>>>(planeString);
                 string vehicleString =
                     Util.MakeRequest(String.Format("{0}/GetAllVehicles", ServiceStrings.Vis));
-                    vehicleList = JsonConvert.DeserializeObject<List<Tuple<int, Point>>>(vehicleString);
+                    vehicleList = JsonConvert.DeserializeObject<List<Tuple<int, Point, int>>>(vehicleString);
                 string passengerString =
                     Util.MakeRequest(String.Format("{0}/GetAllPassengers", ServiceStrings.Vis));
 
-                List<Tuple<int, Point>> bufferPlane = JsonConvert.DeserializeObject<List<Tuple<int, Point>>>(planeString);
-                List<Tuple<int, Point>> bufferVehicle = JsonConvert.DeserializeObject<List<Tuple<int, Point>>>(vehicleString);
-                List<Tuple<int, Point>> bufferPassenger = JsonConvert.DeserializeObject<List<Tuple<int, Point>>>(passengerString);
+                List<Tuple<int, Point, int, int, int>> bufferPlane = JsonConvert.DeserializeObject<List<Tuple<int, Point, int, int, int>>>(planeString);
+                List<Tuple<int, Point, int>> bufferVehicle = JsonConvert.DeserializeObject<List<Tuple<int, Point, int>>>(vehicleString);
+                List<Tuple<int, Point, int>> bufferPassenger = JsonConvert.DeserializeObject<List<Tuple<int, Point, int>>>(passengerString);
 
                 lock (passengerList)
                 {
@@ -208,31 +218,28 @@ namespace Airport_Visualisator
 
             lock (planesList)
             {
-                foreach (Tuple<int, Point> tuple in planesList)
+                foreach (Tuple<int, Point, int, int, int> tuple in planesList)
                 {
-                    DrawEntity(g, (Entity) tuple.Item1, tuple.Item2);
+                    DrawPlane(g, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5);
+//                    DrawEntity(g, (Entity) tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);
                 }
             }
 
             lock (passengerList)
             {
-                foreach (Tuple<int, Point> tuple in passengerList)
+                foreach (Tuple<int, Point, int> tuple in passengerList)
                 {
-                    DrawEntity(g, (Entity)tuple.Item1, tuple.Item2);
+                    DrawEntity(g, (Entity)tuple.Item1, tuple.Item2, tuple.Item3);
                 }
             }
 
             lock (vehicleList)
             {
-                foreach (Tuple<int, Point> tuple in vehicleList)
+                foreach (Tuple<int, Point, int> tuple in vehicleList)
                 {
-                    DrawEntity(g, (Entity)tuple.Item1, tuple.Item2);
+                    DrawEntity(g, (Entity)tuple.Item1, tuple.Item2, tuple.Item3);
                 }
             }
         }
-
-
-
     }
-    
 }

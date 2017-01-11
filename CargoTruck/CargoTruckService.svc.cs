@@ -6,6 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
 using Common;
+using Newtonsoft.Json;
 
 namespace CargoTruck
 {
@@ -27,6 +28,19 @@ namespace CargoTruck
             lock (CargoTruckHandler._CargoTruck.Commands)
             {
                 CargoTruckHandler._CargoTruck.Commands.Add(new Tuple<string, Zone, PlaneServiceStage>(flightId, zone, stage));
+            }
+        }
+
+        public string GetCargo()
+        {
+            return JsonConvert.SerializeObject(CargoTruckHandler._CargoTruck.CurrentCargo);
+        }
+
+        public void Start()
+        {
+            lock (CargoTruckHandler._CargoTruck.Commands)
+            {
+                int a = 3;
             }
         }
     }

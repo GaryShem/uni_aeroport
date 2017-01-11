@@ -6,6 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
 using Common;
+using Newtonsoft.Json;
 
 namespace FuelTruck
 {
@@ -26,6 +27,19 @@ namespace FuelTruck
             lock (FuelTruckHandler._FuelTruck.Commands)
             {
                 FuelTruckHandler._FuelTruck.Commands.Add(new Tuple<string, Zone>(flightId, zone));
+            }
+        }
+
+        public string GetCargo()
+        {
+            return JsonConvert.SerializeObject(FuelTruckHandler._FuelTruck.CurrentFuel);
+        }
+
+        public void Start()
+        {
+            lock (FuelTruckHandler._FuelTruck.Commands)
+            {
+                int a = 3;
             }
         }
     }

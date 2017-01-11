@@ -32,7 +32,7 @@ namespace FuelTruck
         {
             string URL = String.Format("{0}/Move?type={1}&id={2}&zone={3}",
                 ServiceStrings.Vis, (int)Entity.FUEL_TRUCK, _FuelTruck.Id, (int)zone);
-            string response = Util.MakeRequest(URL);
+            Util.MakeRequest(URL);
             _FuelTruck.State = EntityState.MOVING;
         }
 
@@ -40,6 +40,13 @@ namespace FuelTruck
         {
             string URL = String.Format("{0}/Spawn?type={1}&id={2}&zone={3}&cargo={4}",
                 ServiceStrings.Vis, (int)Entity.FUEL_TRUCK, _FuelTruck.Id, (int)Zone.FUEL_STATION, _FuelTruck.CurrentFuel);
+            Util.MakeRequest(URL);
+        }
+
+        private static void UpdateFuel()
+        {
+            string URL = String.Format("{0}/UpdateCargo?id={1}&cargoCount={2}",
+                ServiceStrings.Vis, _FuelTruck.Id, _FuelTruck.CurrentFuel);
             Util.MakeRequest(URL);
         }
 
@@ -85,6 +92,7 @@ namespace FuelTruck
                     else
                     {
                         _FuelTruck.CurrentFuel = Math.Min(_FuelTruck.CurrentFuel+Common.FuelTruck.REFUEL_SPEED, Common.FuelTruck.FUEL_CAPACITY);
+                        UpdateFuel();
                     }
                 }
                 else if (_FuelTruck.CurrentZone == Zone.HANGAR_1 || _FuelTruck.CurrentZone == Zone.HANGAR_2)
@@ -113,7 +121,10 @@ namespace FuelTruck
         private static void RefuelPlane()
         {
             string URL = String.Format("{0}/AcceptFuel?flightId={1}&count={2}", ServiceStrings.Plane, _FuelTruck.CurrentCommand.Item1, Math.Min(_FuelTruck.CurrentFuel, Common.FuelTruck.REFUEL_SPEED));
-            Util.MakeRequest(URL);
+            string response = Util.MakeRequest(URL);
+            int acceptedFuel = JsonConvert.DeserializeObject<int>(response);
+            FuelTruckHandler._FuelTruck.CurrentFuel -= acceptedFuel;
+            UpdateFuel();
         }
     }
 }

@@ -44,6 +44,7 @@ namespace CargoTruck
             string response = Util.MakeRequest(URL);
             int cargoTaken = JsonConvert.DeserializeObject<int>(response);
             _CargoTruck.CurrentCargo = Math.Min(Common.CargoTruck.CARGO_CAPACITY, _CargoTruck.CurrentCargo + cargoTaken);
+            UpdateCargo();
         }
 
         private static void GiveCargoToPlane()
@@ -53,6 +54,7 @@ namespace CargoTruck
                 ServiceStrings.Plane, _CargoTruck.CurrentCommand.Item1, cargoToUnload);
             Util.MakeRequest(URL);
             _CargoTruck.CurrentCargo -= cargoToUnload;
+            UpdateCargo();
         }
 
         private static void SpawnCargoTruck()
@@ -77,6 +79,13 @@ namespace CargoTruck
             string response = Util.MakeRequest(URL);
             int remainingCargo = JsonConvert.DeserializeObject<int>(response);
             return remainingCargo;
+        }
+
+        private static void UpdateCargo()
+        {
+            string URL = String.Format("{0}/UpdateCargo?id={1}&cargoCount={2}",
+                ServiceStrings.Vis, _CargoTruck.Id, _CargoTruck.CurrentCargo);
+            Util.MakeRequest(URL);
         }
 
         public static void HandleCargoTruck()
@@ -107,6 +116,7 @@ namespace CargoTruck
                         if (_CargoTruck.CurrentCargo > 0) //если ещё остался груз на выгрузку в тележке
                         {
                             _CargoTruck.CurrentCargo = Math.Max(_CargoTruck.CurrentCargo-Common.CargoTruck.LOAD_SPEED, 0);
+                            UpdateCargo();
                         }
                         else if (planeStage == PlaneServiceStage.UNLOAD_CARGO) //если в самолёте ещё есть груз
                         {
@@ -129,10 +139,12 @@ namespace CargoTruck
                         {
                             _CargoTruck.CurrentCargo = Math.Min(_CargoTruck.CurrentCargo + Common.CargoTruck.LOAD_SPEED, Common.CargoTruck.CARGO_CAPACITY);
                             _CargoTruck.CurrentCargo = _CargoTruck.CurrentCargo <= remainingCargo ? _CargoTruck.CurrentCargo : remainingCargo;
+                            UpdateCargo();
                         }
                         else
                         {
                             _CargoTruck.CurrentCargo = 0;
+                            UpdateCargo();
                             CompleteCommand();
                         }
                     }
@@ -140,6 +152,7 @@ namespace CargoTruck
                     {
                         //не должны попадать
                         _CargoTruck.CurrentCargo = 0;
+                        UpdateCargo();
                         CompleteCommand();
                     }
                 }

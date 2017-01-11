@@ -5,8 +5,8 @@ namespace Common
 {
     public class CargoTruck
     {
-        public const int CARGO_CAPACITY = 50;
-        public const int LOAD_SPEED = 10;
+        public const int CARGO_CAPACITY = 10;
+        public const int LOAD_SPEED = 5;
         public string Id { get; set; }
         public Zone CurrentZone;
         public EntityState State;
@@ -18,7 +18,7 @@ namespace Common
         {
             Id = Guid.NewGuid().ToString();
             CurrentZone = Zone.CARGO_AREA;
-            CurrentCargo = CARGO_CAPACITY;
+            CurrentCargo = 0;
             State = EntityState.WAITING_FOR_COMMAND;
             Commands = new List<Tuple<string, Zone, PlaneServiceStage>>();
         }

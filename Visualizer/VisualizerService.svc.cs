@@ -153,8 +153,8 @@ namespace Visualizer
         {
             lock (VisualizerHandler.LandVehicles)
             {
-                List<Tuple<int, Point>> vehicleTuples =
-                    VisualizerHandler.LandVehicles.Select(x => new Tuple<int, Point>((int)x.Item1.VehicleType, x.Item2))
+                List<Tuple<int, Point, int>> vehicleTuples =
+                    VisualizerHandler.LandVehicles.Select(x => new Tuple<int, Point, int>((int)x.Item1.VehicleType, x.Item2, x.Item1.Cargo))
                         .ToList();
                 return JsonConvert.SerializeObject(vehicleTuples);
             }
@@ -164,8 +164,8 @@ namespace Visualizer
         {
             lock (VisualizerHandler.Planes)
             {
-                List<Tuple<int, Point>> planeTuples =
-                    VisualizerHandler.Planes.Select(x => new Tuple<int, Point>((int)Entity.PLANE, x.Item2))
+                List<Tuple<int, Point, int, int, int>> planeTuples =
+                    VisualizerHandler.Planes.Select(x => new Tuple<int, Point, int, int, int>((int)Entity.PLANE, x.Item2, x.Item1.Passengers.Count, x.Item1.CargoCount, x.Item1.FuelCount))
                         .ToList();
                 return JsonConvert.SerializeObject(planeTuples);
             }
@@ -179,6 +179,50 @@ namespace Visualizer
                     VisualizerHandler.Passengers.Select(x => new Tuple<int, Point>((int)Entity.PASSENGER, x.Item2))
                         .ToList();
                 return JsonConvert.SerializeObject(passengerTuples);
+            }
+        }
+
+        public void UpdateCargo(string id, int cargoCount)
+        {
+            lock (VisualizerHandler.Planes)
+            {
+                Plane plane = VisualizerHandler.Planes.Select(x => x.Item1).ToList().Find(x => x.Id.Equals(id));
+                if (plane != null)
+                {
+                    plane.CargoCount = cargoCount;
+                }
+            }
+            lock (VisualizerHandler.LandVehicles)
+            {
+                LandVehicle vehicle = VisualizerHandler.LandVehicles.Select(x => x.Item1).ToList().Find(x => x.Id.Equals(id));
+                if (vehicle != null)
+                {
+                    vehicle.Cargo = cargoCount;
+                }
+            }
+        }
+
+        public void UpdatePlane(string id, int passengerCount, int cargoCount, int fuelCount)
+        {
+            lock (VisualizerHandler.Planes)
+            {
+                Plane plane = VisualizerHandler.Planes.Select(x => x.Item1).ToList().Find(x => x.Id.Equals(id));
+                if (plane != null)
+                {
+                    int passengerDifference = plane.PassengerCount - passengerCount;
+                    while (passengerDifference > 0) //если в самолёте стало меньше пассажиров
+                    {
+                        plane.Passengers.RemoveAt(0);
+                        passengerDifference--;
+                    }
+                    while (passengerDifference < 0) //если в самолёте стало больше пассажиров
+                    {
+                        plane.Passengers.Add("");
+                        passengerDifference++;
+                    }
+                    plane.FuelCount = fuelCount;
+                    plane.CargoCount = cargoCount;
+                }
             }
         }
     }

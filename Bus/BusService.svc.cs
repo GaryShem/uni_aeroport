@@ -45,5 +45,13 @@ namespace Bus
             BusHandler._bus.CurrentZone = zone;
             BusHandler._bus.State = EntityState.WAITING_FOR_COMMAND;
         }
+
+        public void Start()
+        {
+            lock (BusHandler._bus.Commands)
+            {
+                int a = 0;
+            }
+        }
     }
 }

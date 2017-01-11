@@ -62,5 +62,19 @@ namespace Visualizer
              BodyStyle = WebMessageBodyStyle.Bare,
              UriTemplate = "GetAllPassengers")]
         string GetAllPassengers();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "UpdateCargo?id={id}&cargoCount={cargoCount}")]
+        void UpdateCargo(string id, int cargoCount);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+             ResponseFormat = WebMessageFormat.Json,
+             BodyStyle = WebMessageBodyStyle.Bare,
+             UriTemplate = "UpdatePlane?id={id}&passengerCount={passengerCount}&cargoCount={cargoCount}&fuelCount={fuelCount}")]
+        void UpdatePlane(string id, int passengerCount, int cargoCount, int fuelCount);
     }
 }

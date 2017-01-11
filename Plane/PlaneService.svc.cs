@@ -15,6 +15,13 @@ namespace Plane
     // NOTE: In order to launch WCF Test Client for testing this service, please select PlaneService.svc or PlaneService.svc.cs at the Solution Explorer and start debugging.
     public class PlaneService : IPlaneService
     {
+        private void UpdatePlane(Common.Plane plane)
+        {
+            string URL = String.Format("{0}/UpdatePlane?id={1}&passengerCount={2}&cargoCount={3}&fuelCount={4}",
+                ServiceStrings.Vis, plane.Id, plane.Passengers.Count, plane.CargoCount, plane.FuelCount);
+            Util.MakeRequest(URL);
+        }
+
         // завершение движения - посадки или отлёта
         void IPlaneService.CompleteMove(string id, int zone)
         {
@@ -64,6 +71,7 @@ namespace Plane
                 URL = String.Format("{0}/CompleteMove?id={1}&zone={2}", ServiceStrings.Passenger, passenger, (int)Zone.PLANE);
                 Util.MakeRequest(URL);
             }
+            UpdatePlane(plane);
             URL = String.Format("{0}/GetPassengers?flightId={1}", ServiceStrings.RegStand, plane.Id);
             response = Util.MakeRequest(URL);
             List<string> passengerList = JsonConvert.DeserializeObject<List<string>>(response);
@@ -91,6 +99,7 @@ namespace Plane
                 result.Add(plane.Passengers[0]);
                 plane.Passengers.RemoveAt(0);
             }
+            UpdatePlane(plane);
             if (plane.Passengers.Count == 0)
             {
                 string URL = String.Format("{0}/FinishUnloadingPassengers?id={1}&zone={2}", ServiceStrings.GrControl, plane.Id, (int) plane.CurrentZone);
@@ -109,6 +118,7 @@ namespace Plane
             }
             acceptedFuel = Math.Min(count, Common.Plane.FuelCapacity - plane.FuelCount);
             plane.FuelCount += acceptedFuel;
+            UpdatePlane(plane);
             if (plane.FuelCount == Common.Plane.FuelCapacity)
             {
                 string URL = String.Format("{0}/FinishRefueling?id={1}&zone={2}", ServiceStrings.GrControl, plane.Id, (int)plane.CurrentZone);
@@ -140,6 +150,17 @@ namespace Plane
             return JsonConvert.SerializeObject(remainingCargo);
         }
 
+        public void GeneratePlane(int passengerCount)
+        {
+            if (PlaneHandler.Planes.Count >= 8)
+                return;
+            Common.Plane plane = PlaneHandler.GeneratePlane(passengerCount);
+            lock (PlaneHandler.Planes)
+            {
+                PlaneHandler.Planes.Add(plane);
+            }
+        }
+
         public void TakeCargoFromTruck(string id, int cargoCount)
         {
             Common.Plane plane;
@@ -148,6 +169,7 @@ namespace Plane
                 plane = PlaneHandler.Planes.Find(x => x.Id.Equals(id));
             }
             plane.CargoCount += cargoCount;
+            UpdatePlane(plane);
             string URL = String.Format("{0}/GetCargo?flightId={1}", ServiceStrings.RegStand, plane.Id);
             string response = Util.MakeRequest(URL);
             int registeredCargo = JsonConvert.DeserializeObject<int>(response);
@@ -167,6 +189,7 @@ namespace Plane
             }
             int givenCargo = Math.Min(plane.CargoCount, cargoCount);
             plane.CargoCount -= givenCargo;
+            UpdatePlane(plane);
             if (plane.CargoCount == 0)
             {
                 string URL = String.Format("{0}/FinishUnloadingCargo?id={1}&zone={2}", ServiceStrings.GrControl, plane.Id, (int)plane.CurrentZone);
