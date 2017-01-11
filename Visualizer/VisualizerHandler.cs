@@ -26,16 +26,16 @@ namespace Visualizer
         static VisualizerHandler()
         {
             Zones.Add(new ExpandedZone(Zone.PASSENGER_SPAWN, new Point(-20,175), new Point(-20+1,175+134)));
-            Zones.Add(new ExpandedZone(Zone.REGISTRATION_STAND, new Point(60, 127), new Point(60+204,127+193)));
-            Zones.Add(new ExpandedZone(Zone.WAITING_AREA, new Point(45,419), new Point(56+187,419+219)));
-            Zones.Add(new ExpandedZone(Zone.BUS_STATION, new Point(287,486), new Point(287+56,486+78)));
-            Zones.Add(new ExpandedZone(Zone.FUEL_STATION, new Point(637,533), new Point(637+148,533+134)));
-            Zones.Add(new ExpandedZone(Zone.CARGO_AREA, new Point(306,317), new Point(306+36,317+42)));
+            Zones.Add(new ExpandedZone(Zone.REGISTRATION_STAND, new Point(60, 127), new Point(60+204,127+190)));
+            Zones.Add(new ExpandedZone(Zone.WAITING_AREA, new Point(60,419), new Point(60+187,419+219)));
+            Zones.Add(new ExpandedZone(Zone.BUS_STATION, new Point(314,506), new Point(314+3,506+39)));
+            Zones.Add(new ExpandedZone(Zone.FUEL_STATION, new Point(757,638), new Point(757+11,638+20)));
+            Zones.Add(new ExpandedZone(Zone.CARGO_AREA, new Point(305,340), new Point(305+10,340+19)));
             Zones.Add(new ExpandedZone(Zone.CARGO_DROPOFF, new Point(192,320), new Point(192+39,320+26)));
             Zones.Add(new ExpandedZone(Zone.HANGAR_1, new Point(557,120), new Point(557+21,120+24)));
-            Zones.Add(new ExpandedZone(Zone.HANGAR_2, new Point(788,268), new Point(788+20,268+22)));
-            Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN_1, new Point(2004,182), new Point(2004+61,182+55)));
-            Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN_2, new Point(2004, 182), new Point(2004 + 61, 182 + 55)));
+            Zones.Add(new ExpandedZone(Zone.HANGAR_2, new Point(714,266), new Point(714+20,266+22)));
+            Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN_1, new Point(2004,120), new Point(2004+61,120+24)));
+            Zones.Add(new ExpandedZone(Zone.PLANE_SPAWN_2, new Point(2004, 266), new Point(2004 + 61, 266+22)));
 
             LandVehicles = new List<Triple<LandVehicle, Point, Point, Zone>>();
             Passengers = new List<Triple<Passenger, Point, Point, Zone>>();
@@ -53,19 +53,22 @@ namespace Visualizer
                 {
                     foreach (Triple<LandVehicle, Point, Point, Zone> landVehicleTriple in LandVehicles)
                     {
+                        int speed = 3;
                         LandVehicle vehicle = landVehicleTriple.Item1;
                         if (vehicle.State != EntityState.MOVING)
                             continue;
                         Point currentPoint = landVehicleTriple.Item2;
                         Point targetPoint = landVehicleTriple.Item3;
                         int diffX = targetPoint.X - currentPoint.X;
-                        diffX = Math.Min(5, Math.Abs(targetPoint.X - currentPoint.X))*Math.Sign(diffX);
                         int diffY = targetPoint.Y - currentPoint.Y;
-                        diffY = Math.Min(5, Math.Abs(targetPoint.Y - currentPoint.Y))*Math.Sign(diffY);
-                        currentPoint.X += diffX;
-                        currentPoint.Y += diffY;
-                        landVehicleTriple.Item2 = currentPoint;
-                        if (currentPoint.X == targetPoint.X && currentPoint.Y == targetPoint.Y)
+                        double length = Math.Sqrt(Math.Pow(diffX, 2) + Math.Pow(diffY, 2));
+                        if (length > speed)
+                        {
+                            diffX = (int)(diffX / length * speed);
+                            diffY = (int)(diffY / length * speed);
+                        }
+                        landVehicleTriple.Item2 = new Point(currentPoint.X + diffX, currentPoint.Y + diffY);
+                        if (landVehicleTriple.Item2.X == targetPoint.X && landVehicleTriple.Item2.Y == targetPoint.Y)
                         {
                             CompleteMove(vehicle.VehicleType, vehicle.Id, landVehicleTriple.Item4);
                             vehicle.CurrentZone = landVehicleTriple.Item4;
@@ -79,16 +82,33 @@ namespace Visualizer
                     foreach (Triple<Passenger, Point, Point, Zone> passengerTriple in Passengers)
                     {
                         Passenger passenger = passengerTriple.Item1;
-                        if (passenger.State != EntityState.MOVING)
-                            continue;
+//                        if (passenger.State != EntityState.MOVING)
+//                        {
+//                            int chance = RandomGen.Next(10);
+//                            if (chance < 1)
+//                            {
+//                                
+//                            }
+//                        }
                         Point currentPoint = passengerTriple.Item2;
                         Point targetPoint = passengerTriple.Item3;
                         int diffX = Math.Sign(targetPoint.X - currentPoint.X);
                         int diffY = Math.Sign(targetPoint.Y - currentPoint.Y);
+                        if (diffX == 0 && diffY == 0 && passenger.State == EntityState.WAITING_FOR_COMMAND)
+                        {
+                            int chance = RandomGen.Next(500);
+                            if (chance < 1)
+                            {
+                                passengerTriple.Item3 = GetZonePoint(passengerTriple.Item4);
+                            }
+                        }
                         passengerTriple.Item2 = new Point(currentPoint.X + diffX, currentPoint.Y + diffY);
                         if (passengerTriple.Item2.X == targetPoint.X && passengerTriple.Item2.Y == targetPoint.Y)
                         {
-                            CompleteMove(Entity.PASSENGER, passenger.Id, passengerTriple.Item4);
+                            if (passengerTriple.Item1.State == EntityState.MOVING)
+                            {
+                                CompleteMove(Entity.PASSENGER, passenger.Id, passengerTriple.Item4);
+                            }
                             passenger.CurrentZone = passengerTriple.Item4;
                             passenger.State = EntityState.WAITING_FOR_COMMAND;
                         }

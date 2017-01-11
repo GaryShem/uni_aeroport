@@ -28,6 +28,7 @@ namespace Airport_Visualisator
         private List<Tuple<int, Point, int, int, int>> planesList;
         private List<Tuple<int, Point, int>> vehicleList;
         private List<Tuple<int, Point, int>> passengerList;
+        Image backgroundImage = Image.FromFile("airport14.png");
         Image bus = Image.FromFile("bus.png");
         Image airplane = Image.FromFile("airplane.png");
         Image fuelcar2 = Image.FromFile("fuelcar2.png");
@@ -71,17 +72,21 @@ namespace Airport_Visualisator
                     g.DrawEllipse(Pens.Black, point.X-1, point.Y-1, 3, 3);
                     break;
                 case Entity.FUEL_TRUCK:
-                    img = fuelcar2;
+                    img = bus;
                     g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
                     g.DrawString(String.Format("Fuel {0}", cargoCount),
-                        new Font("Arial", 10), new SolidBrush(Color.Black), point.X - img.Width / 2, point.Y);
+                        new Font("Arial", 10), new SolidBrush(Color.Black), point.X - img.Width / 2, point.Y + img.Height / 2);
                     break;
                 case Entity.CARGO_TRUCK:
-//                    img = bus;
-//                    g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
-                    g.DrawEllipse(Pens.Black, point.X - 4, point.Y - 4, 9, 9);
+                    img = bus;
+                    g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
                     g.DrawString(String.Format("Cargo {0}", cargoCount),
-                        new Font("Arial", 10), new SolidBrush(Color.Black), point.X - 4, point.Y + 4);
+                        new Font("Arial", 10), new SolidBrush(Color.Black), point.X - img.Width / 2, point.Y + img.Height / 2);
+                    //                    img = bus;
+                    //                    g.DrawImage(img, new Point(point.X - img.Width / 2, point.Y - img.Height / 2));
+                    //                    g.DrawEllipse(Pens.Black, point.X - 4, point.Y - 4, 9, 9);
+                    //                    g.DrawString(String.Format("Cargo {0}", cargoCount),
+                    //                        new Font("Arial", 10), new SolidBrush(Color.Black), point.X - 4, point.Y + 4);
                     break;
                 case Entity.BUS:
                     img = bus;
@@ -157,64 +162,66 @@ namespace Airport_Visualisator
 
         private void drawObjects(Graphics g)
         {
-       
-            g.FillRectangle(new SolidBrush(Color.White), 0, 0, 1366, 768); 
-            g.DrawRectangle(Pens.Black, new Rectangle(50, 110, 229, 269)); // регистрация
-            g.DrawRectangle(Pens.Black, new Rectangle(50, 379, 229, 294)); // зона ожидания
-            g.DrawRectangle(Pens.Black, new Rectangle(279, 443, 72, 166)); //автобусная
-            g.DrawRectangle(Pens.Black, new Rectangle(192, 320, 87, 59)); // хуманы сдают чемоданы
-            g.DrawRectangle(Pens.Black, new Rectangle(279, 301, 69, 79)); // багажная тележка
-
-            g.DrawRectangle(Pens.Black, new Rectangle(599, 533, 228, 184)); // бензинная
-
-            g.DrawRectangle(Pens.Black, new Rectangle(518, 78, 106, 109)); // ангар 1
-            g.DrawRectangle(Pens.Black, new Rectangle(748, 224, 106, 109)); // ангар 2
-
-
-            Point p1 = new Point(624, 79);
-            Point p2 = new Point(1366, 109);
-            g.DrawLine(Pens.Black, p1, p2); // полоса 1
-
-            p1.X = 624;
-            p1.Y = 187;
-            p2.Y = 217;
-            g.DrawLine(Pens.Black, p1, p2); // полоса 2
-
-            p1.X = 852;
-            p1.Y = 224;
-            g.DrawLine(Pens.Black, p1, p2); // полоса 3
-
-            p1.X = 853;
-            p1.Y = 332;
-            p2.X = 1366;
-            p2.Y = 311;
-            g.DrawLine(Pens.Black, p1, p2); // полоса 4
-
-            g.DrawImage(bus, new PointF(x, y)); // весёлый автобус
-            g.DrawImage(airplane, new PointF(x2, y2)); // и его друг самолёт
-            g.DrawImage(fuelcar2, new PointF(x+50, y+100));
-
-            g.DrawImage(human, new PointF(x2 + 50, y2 + 100));
-            x -= 5;
-            y += 0;
-            x2 += 5;
-            y2 += 0;
+            g.DrawImage(backgroundImage, 0, 0, 1366, 767);
+            //Zones.Add(new ExpandedZone(Zone.HANGAR_2, new Point(714,266), new Point(714+20,266+22)));
+//            g.FillRectangle(new SolidBrush(Color.Black), 714, 266, 20, 22);
+            //            g.FillRectangle(new SolidBrush(Color.White), 0, 0, 1366, 768); 
+            //            g.DrawRectangle(Pens.Black, new Rectangle(50, 110, 229, 269)); // регистрация
+            //            g.DrawRectangle(Pens.Black, new Rectangle(50, 379, 229, 294)); // зона ожидания
+            //            g.DrawRectangle(Pens.Black, new Rectangle(279, 443, 72, 166)); //автобусная
+            //            g.DrawRectangle(Pens.Black, new Rectangle(192, 320, 87, 59)); // хуманы сдают чемоданы
+            //            g.DrawRectangle(Pens.Black, new Rectangle(279, 301, 69, 79)); // багажная тележка
+            //
+            //            g.DrawRectangle(Pens.Black, new Rectangle(599, 533, 228, 184)); // бензинная
+            //
+            //            g.DrawRectangle(Pens.Black, new Rectangle(518, 78, 106, 109)); // ангар 1
+            //            g.DrawRectangle(Pens.Black, new Rectangle(748, 224, 106, 109)); // ангар 2
+            //
+            //
+            //            Point p1 = new Point(624, 79);
+            //            Point p2 = new Point(1366, 109);
+            //            g.DrawLine(Pens.Black, p1, p2); // полоса 1
+            //
+            //            p1.X = 624;
+            //            p1.Y = 187;
+            //            p2.Y = 217;
+            //            g.DrawLine(Pens.Black, p1, p2); // полоса 2
+            //
+            //            p1.X = 852;
+            //            p1.Y = 224;
+            //            g.DrawLine(Pens.Black, p1, p2); // полоса 3
+            //
+            //            p1.X = 853;
+            //            p1.Y = 332;
+            //            p2.X = 1366;
+            //            p2.Y = 311;
+            //            g.DrawLine(Pens.Black, p1, p2); // полоса 4
+            //
+            //            g.DrawImage(bus, new PointF(x, y)); // весёлый автобус
+            //            g.DrawImage(airplane, new PointF(x2, y2)); // и его друг самолёт
+            //            g.DrawImage(fuelcar2, new PointF(x+50, y+100));
+            //
+            //            g.DrawImage(human, new PointF(x2 + 50, y2 + 100));
+            //            x -= 5;
+            //            y += 0;
+            //            x2 += 5;
+            //            y2 += 0;
 
             //Реальные зоны:
-            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(60, 127, 204, 193)); // регистрация
-            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(192, 320, 39, 26)); // хуманы отдают багаж сюда
-
-            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(306, 317, 36, 42)); // забор багажа в регистрации
-            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(56, 419, 187, 219)); // ждуны
-
-            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(287, 486, 56, 78)); // автобусная
-            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(637, 533, 148, 134)); // бензинная
-
-            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(557, 120, 21, 24)); // ангар 1
-            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(788, 268, 20, 22)); // ангар 2
-
-            g.DrawRectangle(Pens.Black, new Rectangle(-20, 175, 1, 134)); // спаун людей
-            g.DrawRectangle(Pens.Black, new Rectangle(2004, 182, 61, 55));// спаун самолётов
+            //            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(60, 127, 204, 193)); // регистрация
+            //            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(192, 320, 39, 26)); // хуманы отдают багаж сюда
+            //
+            //            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(306, 317, 36, 42)); // забор багажа в регистрации
+            //            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(56, 419, 187, 219)); // ждуны
+            //
+            //            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(287, 486, 56, 78)); // автобусная
+            //            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(637, 533, 148, 134)); // бензинная
+            //
+            //            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(557, 120, 21, 24)); // ангар 1
+            //            g.FillRectangle(new SolidBrush(Color.Gray), new Rectangle(788, 268, 20, 22)); // ангар 2
+            //
+            //            g.DrawRectangle(Pens.Black, new Rectangle(-20, 175, 1, 134)); // спаун людей
+            //            g.DrawRectangle(Pens.Black, new Rectangle(2004, 182, 61, 55));// спаун самолётов
 
             lock (planesList)
             {

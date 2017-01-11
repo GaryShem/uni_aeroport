@@ -197,7 +197,7 @@ namespace Passenger
                                 else //прилетающий
                                 {
                                     var planeStage = CheckPlaneStage(passenger.FlightId);
-                                    if (planeStage != PlaneServiceStage.UNLOAD_PASSENGERS && planeStage != PlaneServiceStage.UNLOAD_CARGO)
+                                    if (planeStage != PlaneServiceStage.UNLOAD_PASSENGERS && planeStage != PlaneServiceStage.UNLOAD_CARGO && planeStage != PlaneServiceStage.REFUEL)
                                     {
                                         MovePassenger(passenger, Zone.CARGO_DROPOFF);
                                     }
