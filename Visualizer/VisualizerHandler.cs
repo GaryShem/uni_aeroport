@@ -41,7 +41,7 @@ namespace Visualizer
             Passengers = new List<Triple<Passenger, Point, Point, Zone>>();
             Planes = new List<Triple<Plane, Point, Point, Zone>>();
 
-            VisThread = new Thread(HandleVisuals);
+            VisThread = new Thread(HandleVisuals); 
             VisThread.Start();
         }
         public static void HandleVisuals()
@@ -82,14 +82,6 @@ namespace Visualizer
                     foreach (Triple<Passenger, Point, Point, Zone> passengerTriple in Passengers)
                     {
                         Passenger passenger = passengerTriple.Item1;
-//                        if (passenger.State != EntityState.MOVING)
-//                        {
-//                            int chance = RandomGen.Next(10);
-//                            if (chance < 1)
-//                            {
-//                                
-//                            }
-//                        }
                         Point currentPoint = passengerTriple.Item2;
                         Point targetPoint = passengerTriple.Item3;
                         int diffX = Math.Sign(targetPoint.X - currentPoint.X);

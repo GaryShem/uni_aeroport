@@ -46,11 +46,6 @@ namespace Airport_Visualisator
             passList.Show();
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void button4_Click(object sender, EventArgs e)
         {
             string passCountText = textBox1.Text;

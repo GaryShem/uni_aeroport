@@ -20,10 +20,11 @@ namespace Airport_Visualisator
         public PassengerListForm()
         {
             InitializeComponent();
-            listView1.Columns.Add("id", 100, HorizontalAlignment.Left);
-            listView1.Columns.Add("flightid", 100, HorizontalAlignment.Left);
-            listView1.Columns.Add("Location", 100, HorizontalAlignment.Left);
-            listView1.Columns.Add("RegState", 100, HorizontalAlignment.Left);
+            listView1.Columns.Add("ID", 100, HorizontalAlignment.Left);
+            listView1.Columns.Add("Багаж", 100, HorizontalAlignment.Left);
+            listView1.Columns.Add("ID рейса", 100, HorizontalAlignment.Left);
+            listView1.Columns.Add("Локация", 100, HorizontalAlignment.Left);
+            listView1.Columns.Add("Статус", 100, HorizontalAlignment.Left);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -34,7 +35,7 @@ namespace Airport_Visualisator
             listView1.Items.Clear();
             foreach (Passenger passenger in _passengers)
             {
-                string[] row1 = { passenger.FlightId.ToString().Substring(0,8), passenger.CurrentZone.ToString(), passenger.RegState.ToString()};
+                string[] row1 = { passenger.CargoCount.ToString(), passenger.FlightId.ToString().Substring(0,8), passenger.CurrentZone.ToString(), passenger.RegState.ToString()};
                 listView1.Items.Add(passenger.Id.Substring(0,8)).SubItems.AddRange(row1);
 //                ListViewItem lvi = new ListViewItem(new [] {passenger.Id.Substring(0,8), passenger.CurrentZone.ToString(), passenger.RegState.ToString()});
 //                listView1.Items.Add(lvi);

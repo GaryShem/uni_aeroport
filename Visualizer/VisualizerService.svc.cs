@@ -17,10 +17,10 @@ namespace Visualizer
     {
         public static Point GetZonePoint(Zone zone)
         {
-            return VisualizerHandler.GetZonePoint(zone);
+            return VisualizerHandler.GetZonePoint(zone); //получение рандомной точки в нужной зоне
         }
 
-        public void Spawn(int entityNum, string id, int zoneNum, int cargoCount)
+        public void Spawn(int entityNum, string id, int zoneNum, int cargoCount) //спавним объект (все, кроме самолётов)
         {
             Zone zone = (Zone)zoneNum;
             Entity entity = (Entity)entityNum;
@@ -30,7 +30,7 @@ namespace Visualizer
                 case Entity.CARGO_TRUCK:
                 case Entity.FUEL_TRUCK:
                 {
-                    LandVehicle vehicle = new LandVehicle()
+                    LandVehicle vehicle = new LandVehicle() //новая машинка
                     {
                         Cargo = cargoCount,
                         CurrentZone = zone,
@@ -38,15 +38,15 @@ namespace Visualizer
                         State = EntityState.WAITING_FOR_COMMAND,
                         VehicleType = entity
                     };
-                    Point coords = GetZonePoint(zone);
+                    Point coords = GetZonePoint(zone); //выбираем рандомную точку в зоне для спавна
                     lock (VisualizerHandler.LandVehicles)
                     {
                         VisualizerHandler.LandVehicles.Add(new Triple<LandVehicle, Point, Point, Zone>(vehicle, coords,
-                            coords, zone));
+                            coords, zone)); //добавляем в список отрисовки
                     }
                 }
                     break;
-                case Entity.PASSENGER:
+                case Entity.PASSENGER: //новый пассажир
                 {
                     Passenger passenger = new Passenger()
                     {
@@ -60,31 +60,31 @@ namespace Visualizer
                     lock (VisualizerHandler.Passengers)
                     {
                         VisualizerHandler.Passengers.Add(new Triple<Passenger, Point, Point, Zone>(passenger, coords,
-                            coords, zone));
-                    }
+                            coords, zone)); //добавляем в список отрисовки
+                        }
                 }
                     break;
             }
         }
 
-        public void SpawnPlane(int entityNum, string id, int zoneNum, int cargoCount, int passengerCount, int fuelCount)
+        public void SpawnPlane(int entityNum, string id, int zoneNum, int cargoCount, int passengerCount, int fuelCount) //спавним самолёт
         {
             Zone zone = (Zone) zoneNum;
             Entity entity = (Entity) entityNum;
-            List<string> fakePassengers = new List<string>();
+            List<string> fakePassengers = new List<string>(); // лист с фэйковыми пассажирами для вывода информации
             for (int i = 0; i < passengerCount; i++)
             {
                 fakePassengers.Add(null);
             }
-            Plane plane = new Plane(id, fakePassengers, cargoCount, fuelCount);
+            Plane plane = new Plane(id, fakePassengers, cargoCount, fuelCount); // новый самолёт
             Point coords = GetZonePoint(zone);
             lock (VisualizerHandler.Planes)
             {
-                VisualizerHandler.Planes.Add(new Triple<Plane, Point, Point, Zone>(plane, coords, coords, zone));
+                VisualizerHandler.Planes.Add(new Triple<Plane, Point, Point, Zone>(plane, coords, coords, zone)); //добавляем в спсок отрисовки
             }
         }
 
-        public void Despawn(string id)
+        public void Despawn(string id) //удаляем объект
         {
             lock (VisualizerHandler.LandVehicles)
             {
@@ -100,7 +100,7 @@ namespace Visualizer
             }
         }
 
-        public void Move(int entityNum, string id, int zoneNum)
+        public void Move(int entityNum, string id, int zoneNum) //вызываем когда надо запустить движение объекта
         {
             Zone zone = (Zone)zoneNum;
             Entity entity = (Entity)entityNum;
@@ -149,7 +149,7 @@ namespace Visualizer
             }
         }
 
-        public string GetAllVehicles()
+        public string GetAllVehicles() //получение списка всех машинок
         {
             lock (VisualizerHandler.LandVehicles)
             {
@@ -160,7 +160,7 @@ namespace Visualizer
             }
         }
 
-        public string GetAllPlanes()
+        public string GetAllPlanes() //получение списка всех самолётов
         {
             lock (VisualizerHandler.Planes)
             {
@@ -171,7 +171,7 @@ namespace Visualizer
             }
         }
 
-        public string GetAllPassengers()
+        public string GetAllPassengers() //получение списка всех людей
         {
             lock (VisualizerHandler.Passengers)
             {
@@ -182,7 +182,7 @@ namespace Visualizer
             }
         }
 
-        public void UpdateCargo(string id, int cargoCount)
+        public void UpdateCargo(string id, int cargoCount) //обновление значений полей с гурзом/топливом у машинок
         {
             lock (VisualizerHandler.Planes)
             {
@@ -202,7 +202,7 @@ namespace Visualizer
             }
         }
 
-        public void UpdatePlane(string id, int passengerCount, int cargoCount, int fuelCount)
+        public void UpdatePlane(string id, int passengerCount, int cargoCount, int fuelCount) //обновление полей у самолётов
         {
             lock (VisualizerHandler.Planes)
             {
